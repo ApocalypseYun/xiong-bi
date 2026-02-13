@@ -2,7 +2,9 @@
   "active_plan": "/var/folders/s9/898d2fk13lg15npbf5m857yc0000gn/T/vibe-kanban/worktrees/46e7-ulw/xiong-bi/.sisyphus/plans/dormitory-repair-system.md",
   "started_at": "2026-02-13T18:00:08.832Z",
   "session_ids": [
-    "ses_3a7d6fdd8ffejnKKfxm6NT30BY"
+    "ses_3a7d6fdd8ffejnKKfxm6NT30BY",
+    "ses_3a6d2cfdfffe4kAKV6C55lhj8Y",
+    "ses_3a6b7c159ffeGtvErGUMsB3j4J"
   ],
   "plan_name": "dormitory-repair-system",
   "agent": "atlas"

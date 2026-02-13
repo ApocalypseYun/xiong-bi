@@ -1,1 +1,80 @@
-<view></view>
+<view class="container">
+  <!-- Form Card -->
+  <view class="form-card">
+    <!-- Repair Type -->
+    <view class="form-item">
+      <view class="item-label required">报修类型</view>
+      <picker mode="selector" range="{{repairTypes}}" range-key="label" bindchange="onTypeChange">
+        <view class="picker-value {{selectedTypeIndex >= 0 ? 'selected' : 'placeholder'}}">
+          <block wx:if="{{selectedTypeIndex >= 0}}">
+            <text class="type-icon">{{repairTypes[selectedTypeIndex].icon}}</text>
+            <text>{{repairTypes[selectedTypeIndex].label}}</text>
+          </block>
+          <block wx:else>
+            <text>请选择报修类型</text>
+          </block>
+          <text class="arrow">></text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- Building -->
+    <view class="form-item">
+      <view class="item-label required">楼栋</view>
+      <input class="item-input" type="text" placeholder="请输入楼栋（如：A栋）" value="{{building}}" bindinput="onBuildingInput" />
+    </view>
+
+    <!-- Room Number -->
+    <view class="form-item">
+      <view class="item-label required">房间号</view>
+      <input class="item-input" type="text" placeholder="请输入房间号（如：301）" value="{{roomNumber}}" bindinput="onRoomInput" />
+    </view>
+
+    <!-- Contact Phone -->
+    <view class="form-item">
+      <view class="item-label required">联系电话</view>
+      <input class="item-input" type="number" maxlength="11" placeholder="请输入手机号" value="{{contactPhone}}" bindinput="onPhoneInput" />
+    </view>
+
+    <!-- Description -->
+    <view class="form-item description-item">
+      <view class="item-label required">问题描述</view>
+      <textarea class="item-textarea" placeholder="请详细描述故障情况，便于维修人员快速定位问题..." value="{{description}}" bindinput="onDescriptionInput" maxlength="500" />
+      <view class="char-count">{{description.length}}/500</view>
+    </view>
+
+    <!-- Image Upload -->
+    <view class="form-item image-item">
+      <view class="item-label">故障图片</view>
+      <view class="image-upload-section">
+        <view class="image-list">
+          <block wx:for="{{images}}" wx:key="*this">
+            <view class="image-item-wrapper">
+              <image class="uploaded-image" src="{{item}}" mode="aspectFill" bindtap="previewImage" data-index="{{index}}" />
+              <view class="remove-btn" catchtap="removeImage" data-index="{{index}}">
+                <text class="remove-icon">×</text>
+              </view>
+            </view>
+          </block>
+          
+          <view class="upload-btn {{images.length >= maxImages ? 'disabled' : ''}}" bindtap="chooseImage" wx:if="{{images.length < maxImages}}">
+            <view class="upload-icon">
+              <text class="plus">+</text>
+            </view>
+            <text class="upload-text">{{uploading ? '上传中...' : '上传图片'}}</text>
+            <text class="upload-hint">最多{{maxImages}}张</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Submit Button -->
+  <view class="submit-section">
+    <button class="submit-btn {{submitting ? 'loading' : ''}}" bindtap="submitForm" disabled="{{submitting}}">
+      <text wx:if="{{!submitting}}">提交报修</text>
+      <text wx:if="{{submitting}}">提交中...</text>
+    </button>
+    <text class="submit-hint">提交后管理员会尽快处理您的报修请求</text>
+  </view>
+</view>

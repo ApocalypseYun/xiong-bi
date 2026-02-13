@@ -1,1 +1,124 @@
-<view></view>
+<view class="container">
+  <view class="header">
+    <view class="header-title">公告管理</view>
+    <view class="header-subtitle">管理系统公告与通知</view>
+  </view>
+
+  <view class="action-bar">
+    <view class="announcement-count">
+      <text class="count-text">共 {{announcements.length}} 条公告</text>
+    </view>
+    <view class="create-btn" bindtap="onCreate">
+      <text class="btn-icon">+</text>
+      <text class="btn-text">发布公告</text>
+    </view>
+  </view>
+
+  <scroll-view
+    class="content"
+    scroll-y="true"
+    refresher-enabled="true"
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onPullDownRefresh"
+  >
+    <view class="announcement-list">
+      <view 
+        class="announcement-card" 
+        wx:for="{{announcements}}" 
+        wx:key="announcementId"
+        data-id="{{item.announcementId}}"
+        bindtap="onViewDetail"
+      >
+        <view class="card-header">
+          <view class="announcement-title">
+            <text class="title-badge">公告</text>
+            <text class="title-text">{{item.title}}</text>
+          </view>
+          <view class="announcement-actions" catchtap="preventClose">
+            <view 
+              class="action-btn edit" 
+              data-id="{{item.announcementId}}"
+              catchtap="onEdit"
+            >
+              <text class="action-icon">✎</text>
+            </view>
+            <view 
+              class="action-btn delete" 
+              data-id="{{item.announcementId}}"
+              catchtap="onDelete"
+            >
+              <text class="action-icon">🗑</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="card-body">
+          <text class="content-preview">{{item.content}}</text>
+        </view>
+
+        <view class="card-footer">
+          <view class="date-info">
+            <text class="date-icon">📅</text>
+            <text class="date-text">{{item.createdAtFormatted}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{announcements.length === 0 && !loading}}">
+      <view class="empty-icon">📢</view>
+      <text class="empty-text">暂无公告</text>
+      <text class="empty-subtext">点击上方"发布公告"按钮添加第一条公告</text>
+    </view>
+
+    <view class="loading-state" wx:if="{{loading}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+  </scroll-view>
+</view>
+
+<view class="modal-overlay" wx:if="{{showModal}}" bindtap="onCloseModal">
+  <view class="modal-container" catchtap="preventClose">
+    <view class="modal-header">
+      <text class="modal-title">{{modalType === 'create' ? '发布公告' : '编辑公告'}}</text>
+      <view class="close-btn" bindtap="onCloseModal">✕</view>
+    </view>
+
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">公告标题</text>
+        <input 
+          class="form-input" 
+          placeholder="请输入公告标题"
+          value="{{formData.title}}"
+          bindinput="onTitleInput"
+          maxlength="100"
+        />
+      </view>
+
+      <view class="form-group">
+        <text class="form-label">公告内容</text>
+        <textarea 
+          class="form-textarea" 
+          placeholder="请输入公告内容"
+          value="{{formData.content}}"
+          bindinput="onContentInput"
+          maxlength="500"
+          auto-height
+        />
+        <view class="char-count">
+          <text>{{formData.content.length}}/500</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="modal-footer">
+      <view class="btn-cancel" bindtap="onCloseModal">取消</view>
+      <view class="btn-submit {{submitting ? 'disabled' : ''}}" bindtap="onSubmit">
+        <text wx:if="{{!submitting}}">{{modalType === 'create' ? '发布' : '保存'}}</text>
+        <view wx:if="{{submitting}}" class="btn-spinner"></view>
+      </view>
+    </view>
+  </view>
+</view>

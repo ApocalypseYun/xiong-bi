@@ -1,1 +1,5 @@
-{}
+{
+  "navigationBarTitleText": "我的报修记录",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f5f7fa"
+}

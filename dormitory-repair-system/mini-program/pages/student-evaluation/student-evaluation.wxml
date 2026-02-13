@@ -1,1 +1,149 @@
-<view></view>
+<view class="container">
+  <view class="header">
+    <view class="header-title">维修评价</view>
+    <view class="header-subtitle" wx:if="{{!order}}">请选择要评价的订单</view>
+  </view>
+
+  <view class="content" wx:if="{{order}}">
+    <view class="order-card">
+      <view class="card-header">
+        <text class="card-title">订单信息</text>
+        <view class="switch-btn" bindtap="onSwitchOrder" wx:if="{{!existingEvaluation}}">
+          <text>切换订单</text>
+        </view>
+      </view>
+
+      <view class="order-info">
+        <view class="info-item">
+          <text class="info-label">报修类型</text>
+          <text class="info-value">{{order.repairType}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">位置</text>
+          <text class="info-value">{{order.building}} {{order.roomNumber}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">完成时间</text>
+          <text class="info-value">{{order.completedAt}}</text>
+        </view>
+      </view>
+
+      <view class="completion-images" wx:if="{{order.completionImages && order.completionImages.length > 0}}">
+        <text class="section-label">维修完成图片</text>
+        <view class="images-row">
+          <image
+            class="completion-img"
+            wx:for="{{order.completionImages}}"
+            wx:for-item="img"
+            wx:key="imageId"
+            src="{{img.imageUrl}}"
+            mode="aspectFill"
+            data-url="{{img.imageUrl}}"
+            bindtap="onPreviewImage"
+          />
+        </view>
+      </view>
+    </view>
+
+    <view class="evaluation-card">
+      <view class="card-header">
+        <text class="card-title">{{existingEvaluation ? '我的评价' : '填写评价'}}</text>
+      </view>
+
+      <view class="rating-section">
+        <text class="section-label">服务评分</text>
+        <view class="star-rating">
+          <view
+            class="star-item {{rating >= item ? 'active' : ''}} {{existingEvaluation ? 'disabled' : ''}}"
+            wx:for="{{[1, 2, 3, 4, 5]}}"
+            wx:key="*this"
+            data-rating="{{item}}"
+            bindtap="onRatingChange"
+          >
+            <text class="star-icon">★</text>
+          </view>
+        </view>
+        <text class="rating-text" wx:if="{{rating > 0}}">
+          {{rating === 1 ? '非常不满意' : rating === 2 ? '不满意' : rating === 3 ? '一般' : rating === 4 ? '满意' : '非常满意'}}
+        </text>
+      </view>
+
+      <view class="content-section" wx:if="{{!existingEvaluation}}">
+        <text class="section-label">评价内容</text>
+        <textarea
+          class="content-input"
+          placeholder="请分享您的维修体验..."
+          value="{{content}}"
+          maxlength="500"
+          bindinput="onContentInput"
+          disabled="{{existingEvaluation}}"
+        />
+        <view class="char-count">
+          <text>{{content.length}}/500</text>
+        </view>
+      </view>
+
+      <view class="content-display" wx:if="{{existingEvaluation}}">
+        <text class="content-text">{{content || '暂无评价内容'}}</text>
+        <view class="eval-time" wx:if="{{existingEvaluation.createdAt}}">
+          <text>评价时间: {{existingEvaluation.createdAt}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="action-area" wx:if="{{!existingEvaluation}}">
+      <button
+        class="submit-btn {{rating === 0 ? 'disabled' : ''}}"
+        bindtap="onSubmit"
+        disabled="{{submitting || rating === 0}}"
+      >
+        {{submitting ? '提交中...' : '提交评价'}}
+      </button>
+    </view>
+  </view>
+
+  <view class="empty-order" wx:if="{{!order && !loading}}">
+    <view class="empty-icon">📝</view>
+    <text class="empty-text">请先选择要评价的订单</text>
+    <button class="select-btn" bindtap="onSwitchOrder">选择订单</button>
+  </view>
+</view>
+
+<view class="modal-overlay" wx:if="{{showOrderSelector}}">
+  <view class="selector-modal">
+    <view class="selector-header">
+      <text class="selector-title">选择要评价的订单</text>
+      <view class="close-btn" bindtap="onCloseSelector">✕</view>
+    </view>
+
+    <scroll-view class="order-list" scroll-y="true">
+      <view
+        class="selector-order-item"
+        wx:for="{{completedOrders}}"
+        wx:key="orderId"
+        data-id="{{item.orderId}}"
+        bindtap="onSelectOrder"
+      >
+        <view class="selector-order-header">
+          <text class="selector-order-type">{{item.repairType}}</text>
+          <view class="completed-badge">已完成</view>
+        </view>
+        <view class="selector-order-info">
+          <text class="selector-order-location">📍 {{item.building}} {{item.roomNumber}}</text>
+          <text class="selector-order-time">{{item.createdAt}}</text>
+        </view>
+      </view>
+
+      <view class="empty-orders" wx:if="{{completedOrders.length === 0}}">
+        <text>暂无可评价的订单</text>
+      </view>
+    </scroll-view>
+  </view>
+</view>
+
+<view class="loading-mask" wx:if="{{loading}}">
+  <view class="loading-content">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+</view>

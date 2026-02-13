@@ -1,1 +1,85 @@
-<view></view>
+<!--index.wxml-->
+<view class="login-container">
+  <!-- 装饰元素 -->
+  <view class="decorations">
+    <view class="decor-circle decor-circle-1"></view>
+    <view class="decor-circle decor-circle-2"></view>
+    <view class="decor-circle decor-circle-3"></view>
+  </view>
+
+  <!-- Logo区域 -->
+  <view class="logo-section">
+    <view class="logo-icon">
+      <text>🔧</text>
+    </view>
+    <view class="app-title">宿舍报修</view>
+    <view class="app-subtitle">Dormitory Repair System</view>
+  </view>
+
+  <!-- 登录卡片 -->
+  <view class="login-card">
+    <!-- 角色切换Tab -->
+    <view class="role-tabs">
+      <view class="role-tab {{role === 'student' ? 'active' : ''}}" bindtap="switchRole" data-role="student">
+        <text class="role-tab-icon">👨‍🎓</text>
+        <text>学生</text>
+      </view>
+      <view class="role-tab {{role === 'admin' ? 'active' : ''}}" bindtap="switchRole" data-role="admin">
+        <text class="role-tab-icon">👨‍💼</text>
+        <text>管理员</text>
+      </view>
+    </view>
+
+    <!-- 表单区域 -->
+    <view class="form-section">
+      <!-- 用户名 -->
+      <view class="input-group">
+        <text class="input-label">用户名</text>
+        <view class="input-wrapper {{usernameFocus ? 'focus' : ''}} {{errors.username ? 'error' : ''}}">
+          <text class="input-icon">👤</text>
+          <input 
+            class="input-field" 
+            placeholder="请输入用户名" 
+            value="{{username}}"
+            bindinput="onUsernameInput"
+            bindfocus="onUsernameFocus"
+            bindblur="onUsernameBlur"
+          />
+        </view>
+        <text class="error-tip" wx:if="{{errors.username}}">{{errors.username}}</text>
+      </view>
+
+      <!-- 密码 -->
+      <view class="input-group">
+        <text class="input-label">密码</text>
+        <view class="input-wrapper {{passwordFocus ? 'focus' : ''}} {{errors.password ? 'error' : ''}}">
+          <text class="input-icon">🔒</text>
+          <input 
+            class="input-field" 
+            placeholder="请输入密码" 
+            password="{{!showPassword}}"
+            value="{{password}}"
+            bindinput="onPasswordInput"
+            bindfocus="onPasswordFocus"
+            bindblur="onPasswordBlur"
+          />
+          <view class="password-toggle" bindtap="togglePasswordVisibility">
+            <text>{{showPassword ? '🙈' : '👁️'}}</text>
+          </view>
+        </view>
+        <text class="error-tip" wx:if="{{errors.password}}">{{errors.password}}</text>
+      </view>
+    </view>
+
+    <!-- 登录按钮 -->
+    <button class="login-btn {{isLoading ? 'loading' : ''}}" bindtap="handleLogin" disabled="{{isLoading}}">
+      {{isLoading ? '登录中...' : '登 录'}}
+    </button>
+
+    <!-- 底部链接 -->
+    <view class="bottom-links">
+      <text class="link-text" bindtap="goToRegister">注册账号</text>
+      <text class="link-text" bindtap="goToForgotPassword">忘记密码?</text>
+    </view>
+  </view>
+</view>

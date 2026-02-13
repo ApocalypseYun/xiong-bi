@@ -1,1 +1,5 @@
-{}
+{
+  "navigationBarTitleText": "学生首页",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f5f5f5"
+}
