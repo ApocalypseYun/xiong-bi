@@ -1,0 +1,224 @@
+page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+.register-container {
+  min-height: 100vh;
+  padding: 40rpx;
+  box-sizing: border-box;
+}
+
+/* 头部 */
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40rpx;
+  padding-top: 20rpx;
+}
+
+.back-btn {
+  width: 70rpx;
+  height: 70rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: #ffffff;
+  backdrop-filter: blur(10rpx);
+}
+
+.header-title {
+  flex: 1;
+  text-align: center;
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #ffffff;
+  margin-right: 70rpx;
+}
+
+/* 注册卡片 */
+.register-card {
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 40rpx;
+  padding: 50rpx 40rpx;
+  box-shadow: 0 30rpx 80rpx rgba(0, 0, 0, 0.2);
+}
+
+/* 角色切换 */
+.role-section {
+  margin-bottom: 40rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  color: #5a6270;
+  margin-bottom: 20rpx;
+  font-weight: 500;
+}
+
+.role-tabs {
+  display: flex;
+  background: #f5f7fa;
+  border-radius: 20rpx;
+  padding: 8rpx;
+}
+
+.role-tab {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #8b92a8;
+  transition: all 0.3s ease;
+}
+
+.role-tab.active {
+  background: #ffffff;
+  color: #667eea;
+  box-shadow: 0 4rpx 20rpx rgba(102, 126, 234, 0.25);
+  font-weight: 600;
+}
+
+.role-tab-icon {
+  font-size: 32rpx;
+  margin-right: 8rpx;
+}
+
+/* 表单区域 */
+.form-section {
+  margin-bottom: 30rpx;
+}
+
+.input-group {
+  margin-bottom: 28rpx;
+}
+
+.input-label {
+  display: block;
+  font-size: 26rpx;
+  color: #5a6270;
+  margin-bottom: 12rpx;
+  font-weight: 500;
+}
+
+.input-label .required {
+  color: #ff6b6b;
+  margin-left: 4rpx;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #f8f9fc;
+  border-radius: 16rpx;
+  padding: 22rpx 26rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.3s ease;
+}
+
+.input-wrapper.error {
+  border-color: #ff6b6b;
+  background: #fff5f5;
+}
+
+.input-icon {
+  font-size: 32rpx;
+  margin-right: 16rpx;
+  color: #8b92a8;
+}
+
+.input-field {
+  flex: 1;
+  font-size: 28rpx;
+  color: #2d3748;
+  height: 44rpx;
+  line-height: 44rpx;
+}
+
+.input-field::placeholder {
+  color: #a0aec0;
+}
+
+.password-toggle {
+  padding: 8rpx;
+  font-size: 28rpx;
+  color: #8b92a8;
+}
+
+.error-tip {
+  font-size: 22rpx;
+  color: #ff6b6b;
+  margin-top: 8rpx;
+  padding-left: 8rpx;
+}
+
+/* 分栏布局 */
+.form-row {
+  display: flex;
+  gap: 20rpx;
+}
+
+.form-row .input-group {
+  flex: 1;
+}
+
+/* 注册按钮 */
+.register-btn {
+  width: 100%;
+  height: 96rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 10rpx 40rpx rgba(102, 126, 234, 0.4);
+  margin-top: 40rpx;
+}
+
+.register-btn::after {
+  border: none;
+}
+
+.register-btn:active {
+  transform: translateY(4rpx);
+  box-shadow: 0 6rpx 20rpx rgba(102, 126, 234, 0.3);
+}
+
+/* 底部提示 */
+.bottom-tip {
+  text-align: center;
+  margin-top: 30rpx;
+}
+
+.tip-text {
+  font-size: 26rpx;
+  color: #8b92a8;
+}
+
+.tip-link {
+  color: #667eea;
+  font-weight: 500;
+}
+
+/* 动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.register-card {
+  animation: fadeInUp 0.6s ease-out;
+}

@@ -1,1 +1,216 @@
-<view></view>
+<view class="container">
+  <!-- Date Filter Section -->
+  <view class="filter-section">
+    <view class="filter-header">
+      <text class="filter-title">📅 日期筛选</text>
+      <text class="filter-reset" bindtap="resetDateFilter">重置</text>
+    </view>
+    
+    <view class="date-picker-row">
+      <view class="date-picker">
+        <text class="picker-label">开始日期</text>
+        <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+          <view class="picker-value">{{startDate}}</view>
+        </picker>
+      </view>
+      
+      <text class="date-separator">至</text>
+      
+      <view class="date-picker">
+        <text class="picker-label">结束日期</text>
+        <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+          <view class="picker-value">{{endDate}}</view>
+        </picker>
+      </view>
+    </view>
+    
+    <button class="search-btn" bindtap="searchOrders">🔍 查询订单</button>
+  </view>
+
+  <!-- Loading State -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- Empty State -->
+  <view class="empty-state" wx:if="{{!loading && orders.length === 0}}">
+    <view class="empty-icon">✅</view>
+    <text class="empty-text">暂无已完成订单</text>
+    <text class="empty-subtext">试试调整日期范围</text>
+  </view>
+
+  <!-- Order List -->
+  <view class="order-list" wx:if="{{!loading && orders.length > 0}}">
+    <view class="list-header">
+      <text class="order-count">共 {{orders.length}} 条记录</text>
+    </view>
+
+    <view 
+      class="order-card completed" 
+      wx:for="{{orders}}" 
+      wx:key="orderId"
+      bindtap="showOrderDetail"
+      data-order="{{item}}"
+    >
+      <view class="card-header">
+        <view class="repair-type">
+          <text class="type-icon">{{repairTypeMap[item.repairType] || '🔧'}}</text>
+          <text class="type-text">{{item.repairType}}</text>
+        </view>
+        <view class="status-badge completed">
+          已完成
+        </view>
+      </view>
+
+      <view class="card-body">
+        <view class="info-row">
+          <text class="info-label">📍 位置</text>
+          <text class="info-value">{{item.building}} {{item.roomNumber}}</text>
+        </view>
+        
+        <view class="info-row">
+          <text class="info-label">📞 联系电话</text>
+          <text class="info-value">{{item.contactPhone}}</text>
+        </view>
+        
+        <view class="info-row">
+          <text class="info-label">📝 问题描述</text>
+          <text class="info-value description">{{item.description}}</text>
+        </view>
+      </view>
+
+      <view class="card-footer">
+        <view class="time-info">
+          <text class="time-label">完成时间</text>
+          <text class="time-value">{{item.completedAt}}</text>
+        </view>
+        
+        <view class="evaluation-badge" wx:if="{{item.evaluation}}">
+          <text class="stars">{{'★'.repeat(item.evaluation.rating)}}{{item.evaluation.rating < 5 ? '☆'.repeat(5 - item.evaluation.rating) : ''}}</text>
+          <text class="has-eval">已评价</text>
+        </view>
+        
+        <view class="evaluation-badge no-eval" wx:if="{{!item.evaluation}}">
+          <text>未评价</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Order Detail Modal -->
+  <view class="modal {{showModal ? 'show' : ''}}" wx:if="{{showModal}}">
+    <view class="modal-overlay" bindtap="closeModal"></view>
+    <view class="modal-content" catchtap="preventBubble">
+      <view class="modal-header">
+        <text class="modal-title">订单详情</text>
+        <view class="close-btn" bindtap="closeModal">✕</view>
+      </view>
+
+      <scroll-view class="modal-body" scroll-y>
+        <view class="detail-section" wx:if="{{currentOrder}}">
+          <!-- Status Badge -->
+          <view class="detail-status-row">
+            <view class="status-badge large completed">已完成</view>
+          </view>
+
+          <view class="detail-row">
+            <text class="detail-label">报修类型</text>
+            <view class="detail-value">
+              <text>{{repairTypeMap[currentOrder.repairType] || '🔧'}}</text>
+              <text>{{currentOrder.repairType}}</text>
+            </view>
+          </view>
+
+          <view class="detail-row">
+            <text class="detail-label">楼栋房间</text>
+            <text class="detail-value">{{currentOrder.building}} {{currentOrder.roomNumber}}</text>
+          </view>
+
+          <view class="detail-row">
+            <text class="detail-label">联系电话</text>
+            <text class="detail-value">{{currentOrder.contactPhone}}</text>
+          </view>
+
+          <view class="detail-row">
+            <text class="detail-label">问题描述</text>
+            <text class="detail-value description">{{currentOrder.description}}</text>
+          </view>
+
+          <!-- Original Images -->
+          <view class="detail-row" wx:if="{{currentOrder.images && currentOrder.images.length > 0}}">
+            <text class="detail-label">报修图片</text>
+            <view class="image-list">
+              <image 
+                wx:for="{{currentOrder.images}}" 
+                wx:key="imageId"
+                class="detail-image" 
+                src="{{item.imageUrl}}" 
+                mode="aspectFill"
+                bindtap="previewImage"
+                data-url="{{item.imageUrl}}"
+                data-urls="{{currentOrder.images.map(img => img.imageUrl)}}"
+              />
+            </view>
+          </view>
+
+          <!-- Completion Images -->
+          <view class="detail-row" wx:if="{{currentOrder.completionImages && currentOrder.completionImages.length > 0}}">
+            <text class="detail-label">完成凭证</text>
+            <view class="image-list">
+              <image 
+                wx:for="{{currentOrder.completionImages}}" 
+                wx:key="imageId"
+                class="detail-image" 
+                src="{{item.imageUrl}}" 
+                mode="aspectFill"
+                bindtap="previewImage"
+                data-url="{{item.imageUrl}}"
+                data-urls="{{currentOrder.completionImages.map(img => img.imageUrl)}}"
+              />
+            </view>
+          </view>
+
+          <view class="detail-row">
+            <text class="detail-label">提交时间</text>
+            <text class="detail-value">{{currentOrder.createdAt}}</text>
+          </view>
+
+          <view class="detail-row">
+            <text class="detail-label">完成时间</text>
+            <text class="detail-value">{{currentOrder.completedAt}}</text>
+          </view>
+
+          <!-- Evaluation Section -->
+          <view class="evaluation-section" wx:if="{{currentOrder.evaluation}}">
+            <view class="section-title">📝 用户评价</view>
+            
+            <view class="evaluation-content">
+              <view class="rating-row">
+                <text class="rating-label">评分</text>
+                <view class="rating-stars">
+                  <text class="star filled" wx:for="{{[1,2,3,4,5]}}" wx:key="*this" wx:if="{{item <= currentOrder.evaluation.rating}}">★</text>
+                  <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="*this" wx:if="{{item > currentOrder.evaluation.rating}}">★</text>
+                </view>
+                <text class="rating-text">{{evaluationLabels[currentOrder.evaluation.rating - 1]}}</text>
+              </view>
+              
+              <view class="comment-row" wx:if="{{currentOrder.evaluation.comment}}">
+                <text class="comment-label">评价内容</text>
+                <text class="comment-text">{{currentOrder.evaluation.comment}}</text>
+              </view>
+              
+              <view class="eval-time">
+                <text>评价时间：{{currentOrder.evaluation.createdAt}}</text>
+              </view>
+            </view>
+          </view>
+
+          <view class="no-evaluation" wx:if="{{!currentOrder.evaluation}}">
+            <text>该订单尚未收到用户评价</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</view>

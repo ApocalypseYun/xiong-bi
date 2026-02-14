@@ -208,7 +208,7 @@ Wave 7 (Final):
 
 ### Wave 1: 项目初始化
 
-- [ ] 1. 创建项目目录结构
+- [x] 1. 创建项目目录结构
 
   **What to do**:
   - 创建主项目目录 `dormitory-repair-system/`
@@ -270,7 +270,7 @@ Wave 7 (Final):
 
 ---
 
-- [ ] 2. 初始化Node.js后端项目
+- [x] 2. 初始化Node.js后端项目
 
   **What to do**:
   - 在 `server/` 目录下运行 `npm init -y`
@@ -368,7 +368,7 @@ Wave 7 (Final):
 
 ---
 
-- [ ] 3. 初始化微信小程序项目结构
+- [x] 3. 初始化微信小程序项目结构
 
   **What to do**:
   - 在 `mini-program/` 目录下创建小程序基础文件
@@ -507,7 +507,7 @@ Wave 7 (Final):
 
 ### Wave 2: 数据库和服务器配置
 
-- [ ] 4. 创建数据库和表结构
+- [x] 4. 创建数据库和表结构
 
   **What to do**:
   - 编写完整的数据库初始化SQL脚本
@@ -599,7 +599,7 @@ Wave 7 (Final):
 
 ---
 
-- [ ] 5. 配置Express服务器和中间件
+- [x] 5. 配置Express服务器和中间件
 
   **What to do**:
   - 完成 `server/app.js` 实现
@@ -787,7 +787,7 @@ Wave 7 (Final):
 ---
 ### Wave 3: 核心API实现 (认证、用户、上传)
 
-- [ ] 6. 实现认证API (注册/登录/找回密码)
+- [x] 6. 实现认证API (注册/登录/找回密码)
 
   **What to do**:
   - 创建 `server/routes/auth.js` 和 `server/controllers/authController.js`
@@ -821,7 +821,7 @@ Wave 7 (Final):
 
 ---
 
-- [ ] 7. 实现用户管理API
+- [x] 7. 实现用户管理API
 
   **What to do**:
   - 创建 `server/routes/user.js` 和 `server/controllers/userController.js`
@@ -837,7 +837,7 @@ Wave 7 (Final):
 
 ---
 
-- [ ] 8. 实现图片上传API
+- [x] 8. 实现图片上传API
 
   **What to do**:
   - 创建 `server/routes/upload.js`
@@ -856,7 +856,7 @@ Wave 7 (Final):
 
 ### Wave 4: 业务API实现 (订单、评价、公告)
 
-- [ ] 9. 实现报修订单API (学生端)
+- [x] 9. 实现报修订单API (学生端)
 
   **What to do**:
   - POST /api/orders - 创建报修单(含图片关联)
@@ -873,7 +873,7 @@ Wave 7 (Final):
 
 ---
 
-- [ ] 10. 实现管理员订单API
+- [x] 10. 实现管理员订单API
 
   **What to do**:
   - GET /api/admin/orders - 获取所有订单(支持日期筛选)
@@ -891,7 +891,7 @@ Wave 7 (Final):
 
 ---
 
-- [ ] 11. 实现评价和公告API
+- [x] 11. 实现评价和公告API
 
   **What to do**:
   - POST /api/evaluations - 学生创建评价(仅completed订单)
@@ -914,7 +914,7 @@ Wave 7 (Final):
 
 ### Wave 5: 前端登录和学生页面
 
-- [ ] 12. 开发登录/注册/找回密码页面
+- [x] 12. 开发登录/注册/找回密码页面
 
   **What to do**:
   - `pages/index/index` - 登录页面(学生/管理员切换)
@@ -938,7 +938,7 @@ Wave 7 (Final):
 
 ---
 
-- [ ] 13. 开发学生首页和报修页面
+- [x] 13. 开发学生首页和报修页面
 
   **What to do**:
   - `pages/student/student` - 学生首页(公告+功能入口)
@@ -962,7 +962,7 @@ Wave 7 (Final):
 
 ---
 
-- [ ] 14. 开发学生记录和评价页面
+- [x] 14. 开发学生记录和评价页面
 
   **What to do**:
   - `pages/student-records/student-records` - 维修记录
@@ -988,7 +988,7 @@ Wave 7 (Final):
 
 ### Wave 6: 前端管理员页面
 
-- [ ] 15. 开发管理员首页
+- [x] 15. 开发管理员首页
 
   **What to do**:
   - `pages/admin/admin` - 管理员首页
@@ -1003,7 +1003,7 @@ Wave 7 (Final):
 
 ---
 
-- [ ] 16. 开发管理员订单处理页面
+- [x] 16. 开发管理员订单处理页面
 
   **What to do**:
   - `pages/admin-pending/admin-pending` - 待处理订单
@@ -1024,7 +1024,7 @@ Wave 7 (Final):
 
 ---
 
-- [ ] 17. 开发公告管理页面
+- [x] 17. 开发公告管理页面
 
   **What to do**:
   - `pages/admin-announcements/admin-announcements` - 公告管理
@@ -1048,7 +1048,7 @@ Wave 7 (Final):
 
 ### Wave 7: 部署和文档
 
-- [ ] 18. 创建启动脚本和使用文档
+- [x] 18. 创建启动脚本和使用文档
 
   **What to do**:
   - 创建 `README.md` - 项目说明和部署指南

@@ -1,1 +1,208 @@
-<view></view>
+<view class="container">
+  <!-- Loading State -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- Empty State -->
+  <view class="empty-state" wx:if="{{!loading && orders.length === 0}}">
+    <view class="empty-icon">📋</view>
+    <text class="empty-text">暂无待处理订单</text>
+    <text class="empty-subtext">下拉刷新查看新订单</text>
+  </view>
+
+  <!-- Order List -->
+  <view class="order-list" wx:if="{{!loading && orders.length > 0}}">
+    <view 
+      class="order-card {{item.status}}" 
+      wx:for="{{orders}}" 
+      wx:key="orderId"
+      bindtap="showOrderDetail"
+      data-order="{{item}}"
+    >
+      <view class="card-header">
+        <view class="repair-type">
+          <text class="type-icon">{{repairTypeMap[item.repairType] || '🔧'}}</text>
+          <text class="type-text">{{item.repairType}}</text>
+        </view>
+        <view class="status-badge {{item.status}}">
+          {{item.status === 'pending' ? '待处理' : '处理中'}}
+        </view>
+      </view>
+
+      <view class="card-body">
+        <view class="info-row">
+          <text class="info-label">📍 位置</text>
+          <text class="info-value">{{item.building}} {{item.roomNumber}}</text>
+        </view>
+        
+        <view class="info-row">
+          <text class="info-label">📞 联系电话</text>
+          <text class="info-value">{{item.contactPhone}}</text>
+        </view>
+        
+        <view class="info-row">
+          <text class="info-label">📝 问题描述</text>
+          <text class="info-value description">{{item.description}}</text>
+        </view>
+      </view>
+
+      <view class="card-footer">
+        <text class="order-time">{{item.createdAt}}</text>
+        <view class="action-btns">
+          <button 
+            class="btn btn-primary" 
+            wx:if="{{item.status === 'pending'}}"
+            catchtap="acceptOrder"
+            data-order-id="{{item.orderId}}"
+          >
+            接单
+          </button>
+          <button 
+            class="btn btn-success" 
+            wx:if="{{item.status === 'processing'}}"
+            catchtap="showCompleteModal"
+            data-order="{{item}}"
+          >
+            完成报修
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Order Detail Modal -->
+  <view class="modal {{showModal ? 'show' : ''}}" wx:if="{{showModal}}">
+    <view class="modal-overlay" bindtap="closeModal"></view>
+    <view class="modal-content" catchtap="preventBubble">
+      <view class="modal-header">
+        <text class="modal-title">订单详情</text>
+        <view class="close-btn" bindtap="closeModal">✕</view>
+      </view>
+
+      <scroll-view class="modal-body" scroll-y>
+        <view class="detail-section" wx:if="{{currentOrder}}">
+          <view class="detail-row">
+            <text class="detail-label">报修类型</text>
+            <view class="detail-value">
+              <text>{{repairTypeMap[currentOrder.repairType] || '🔧'}}</text>
+              <text>{{currentOrder.repairType}}</text>
+            </view>
+          </view>
+
+          <view class="detail-row">
+            <text class="detail-label">订单状态</text>
+            <view class="status-badge {{currentOrder.status}}">
+              {{currentOrder.status === 'pending' ? '待处理' : '处理中'}}
+            </view>
+          </view>
+
+          <view class="detail-row">
+            <text class="detail-label">楼栋房间</text>
+            <text class="detail-value">{{currentOrder.building}} {{currentOrder.roomNumber}}</text>
+          </view>
+
+          <view class="detail-row">
+            <text class="detail-label">联系电话</text>
+            <text class="detail-value">{{currentOrder.contactPhone}}</text>
+          </view>
+
+          <view class="detail-row">
+            <text class="detail-label">问题描述</text>
+            <text class="detail-value description">{{currentOrder.description}}</text>
+          </view>
+
+          <view class="detail-row" wx:if="{{currentOrder.images && currentOrder.images.length > 0}}">
+            <text class="detail-label">报修图片</text>
+            <view class="image-list">
+              <image 
+                wx:for="{{currentOrder.images}}" 
+                wx:key="imageId"
+                class="detail-image" 
+                src="{{item.imageUrl}}" 
+                mode="aspectFill"
+                bindtap="previewImage"
+                data-url="{{item.imageUrl}}"
+                data-urls="{{currentOrder.images.map(img => img.imageUrl)}}"
+              />
+            </view>
+          </view>
+
+          <view class="detail-row">
+            <text class="detail-label">提交时间</text>
+            <text class="detail-value">{{currentOrder.createdAt}}</text>
+          </view>
+        </view>
+      </scroll-view>
+
+      <view class="modal-footer">
+        <button 
+          class="btn btn-primary btn-full" 
+          wx:if="{{currentOrder.status === 'pending'}}"
+          bindtap="acceptOrder"
+          data-order-id="{{currentOrder.orderId}}"
+        >
+          接单处理
+        </button>
+        <button 
+          class="btn btn-success btn-full" 
+          wx:if="{{currentOrder.status === 'processing'}}"
+          bindtap="showCompleteModal"
+          data-order="{{currentOrder}}"
+        >
+          完成报修
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- Complete Order Modal -->
+  <view class="modal {{showCompleteModal ? 'show' : ''}}" wx:if="{{showCompleteModal}}">
+    <view class="modal-overlay" bindtap="closeCompleteModal"></view>
+    <view class="modal-content" catchtap="preventBubble">
+      <view class="modal-header">
+        <text class="modal-title">完成报修</text>
+        <view class="close-btn" bindtap="closeCompleteModal">✕</view>
+      </view>
+
+      <view class="modal-body">
+        <view class="upload-section">
+          <text class="upload-label">上传完成凭证</text>
+          <text class="upload-hint">请上传维修完成后的照片（最多3张）</text>
+          
+          <view class="upload-list">
+            <view 
+              class="upload-item image-preview" 
+              wx:for="{{completionImages}}" 
+              wx:key="*this"
+            >
+              <image class="preview-img" src="{{item}}" mode="aspectFill" bindtap="previewCompletionImage" data-url="{{item}}" />
+              <view class="remove-btn" catchtap="removeCompletionImage" data-index="{{index}}">✕</view>
+            </view>
+            
+            <view class="upload-item upload-btn" wx:if="{{completionImages.length < 3}}" bindtap="chooseCompletionImages">
+              <text class="upload-icon">+</text>
+              <text class="upload-text">上传图片</text>
+            </view>
+          </view>
+
+          <view class="upload-loading" wx:if="{{uploadLoading}}">
+            <view class="spinner"></view>
+            <text>上传中...</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="modal-footer">
+        <button 
+          class="btn btn-success btn-full {{submitting ? 'loading' : ''}}" 
+          disabled="{{submitting}}"
+          bindtap="submitCompleteOrder"
+        >
+          {{submitting ? '提交中...' : '确认完成'}}
+        </button>
+      </view>
+    </view>
+  </view>
+</view>

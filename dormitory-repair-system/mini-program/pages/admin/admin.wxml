@@ -1,1 +1,75 @@
-<view></view>
+<view class="container">
+  <!-- User Info Header -->
+  <view class="user-header">
+    <view class="user-info">
+      <view class="avatar">
+        <text class="avatar-text">{{userInfo.realName ? userInfo.realName[0] : '管'}}</text>
+      </view>
+      <view class="user-detail">
+        <text class="user-name">{{userInfo.realName || '管理员'}}</text>
+        <text class="user-role">宿舍维修管理员</text>
+      </view>
+    </view>
+    <view class="logout-btn" bindtap="handleLogout">
+      <text class="logout-icon">退出</text>
+    </view>
+  </view>
+
+  <!-- Pending Orders Statistics Card -->
+  <view class="stats-section">
+    <view class="stats-card" bindtap="goToPendingOrders">
+      <view class="stats-content">
+        <view class="stats-icon pending">🕐</view>
+        <view class="stats-info">
+          <text class="stats-number">{{pendingCount}}</text>
+          <text class="stats-label">待处理订单</text>
+        </view>
+      </view>
+      <view class="stats-arrow">
+        <text class="arrow-icon">›</text>
+      </view>
+      <view class="stats-badge" wx:if="{{pendingCount > 0}}">
+        <text>待处理</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Quick Actions Grid -->
+  <view class="section">
+    <view class="section-title">
+      <text class="title-icon">⚡</text>
+      <text>管理功能</text>
+    </view>
+    
+    <view class="action-grid">
+      <view class="action-item" bindtap="goToPendingOrders">
+        <view class="action-icon pending">🕐</view>
+        <text class="action-name">待处理订单</text>
+        <view class="action-badge" wx:if="{{pendingCount > 0}}">{{pendingCount}}</view>
+      </view>
+      
+      <view class="action-item" bindtap="goToCompletedOrders">
+        <view class="action-icon completed">✓</view>
+        <text class="action-name">已完成订单</text>
+      </view>
+      
+      <view class="action-item" bindtap="goToAnnouncements">
+        <view class="action-icon announcement">📢</view>
+        <text class="action-name">公告管理</text>
+      </view>
+      
+      <view class="action-item" bindtap="goToEvaluations">
+        <view class="action-icon evaluation">⭐</view>
+        <text class="action-name">我的评价</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Tips Section -->
+  <view class="tips-section">
+    <view class="tips-card">
+      <text class="tips-title">💡 工作提示</text>
+      <text class="tips-content">请及时处理待办维修订单，保持良好的服务响应速度。学生的满意度是我们工作的最高标准。</text>
+    </view>
+  </view>
+</view>

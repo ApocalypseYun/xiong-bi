@@ -1,1 +1,187 @@
-<view></view>
+<view class="container">
+  <view class="header">
+    <view class="header-title">我的报修记录</view>
+  </view>
+
+  <view class="tab-bar">
+    <view
+      class="tab-item {{currentTab === item.key ? 'active' : ''}}"
+      wx:for="{{tabs}}"
+      wx:key="key"
+      data-tab="{{item.key}}"
+      bindtap="onTabChange"
+    >
+      <text class="tab-text">{{item.label}}</text>
+      <view class="tab-indicator" wx:if="{{currentTab === item.key}}"></view>
+    </view>
+  </view>
+
+  <scroll-view
+    class="order-list"
+    scroll-y="true"
+    refresher-enabled="true"
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onPullDownRefresh"
+    bindscrolltolower="onLoadMore"
+  >
+    <view class="order-card" wx:for="{{orders}}" wx:key="orderId" data-id="{{item.orderId}}" bindtap="onOrderClick">
+      <view class="order-header">
+        <view class="order-type">{{item.repairType}}</view>
+        <view class="status-badge" style="background-color: {{item.statusInfo.bgColor}}; color: {{item.statusInfo.color}};">
+          {{item.statusInfo.text}}
+        </view>
+      </view>
+
+      <view class="order-body">
+        <view class="location-info">
+          <view class="info-row">
+            <text class="info-icon">📍</text>
+            <text class="info-text">{{item.building}} {{item.roomNumber}}</text>
+          </view>
+          <view class="info-row">
+            <text class="info-icon">📞</text>
+            <text class="info-text">{{item.contactPhone}}</text>
+          </view>
+        </view>
+
+        <view class="description" wx:if="{{item.description}}">
+          <text class="desc-text">{{item.description}}</text>
+        </view>
+
+        <view class="image-preview" wx:if="{{item.images && item.images.length > 0}}">
+          <image
+            class="preview-img"
+            wx:for="{{item.images.slice(0, 3)}}"
+            wx:for-item="img"
+            wx:key="imageId"
+            src="{{img.imageUrl}}"
+            mode="aspectFill"
+            data-url="{{img.imageUrl}}"
+            data-urls="{{item.images.map(i => i.imageUrl)}}"
+            catchtap="onPreviewImage"
+          />
+          <view class="more-images" wx:if="{{item.images.length > 3}}">
+            <text class="more-text">+{{item.images.length - 3}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="order-footer">
+        <text class="order-id">单号: {{item.orderId}}</text>
+        <text class="order-time">{{item.createdAtFormatted}}</text>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{orders.length === 0 && !loading}}">
+      <view class="empty-icon">📋</view>
+      <text class="empty-text">暂无{{currentTab ? tabs.find(t => t.key === currentTab).label : ''}}记录</text>
+      <text class="empty-subtext">点击右下角"我要报修"按钮提交新订单</text>
+    </view>
+
+    <view class="loading-more" wx:if="{{loading && orders.length > 0}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <view class="no-more" wx:if="{{!hasMore && orders.length > 0}}">
+      <text>没有更多记录了</text>
+    </view>
+  </scroll-view>
+</view>
+
+<view class="modal-overlay" wx:if="{{showDetailModal}}" bindtap="onCloseDetail">
+  <view class="detail-modal" catchtap="preventClose">
+    <view class="modal-header">
+      <text class="modal-title">订单详情</text>
+      <view class="close-btn" bindtap="onCloseDetail">✕</view>
+    </view>
+
+    <scroll-view class="modal-body" scroll-y="true">
+      <view class="detail-section" wx:if="{{currentOrder}}">
+        <view class="detail-row">
+          <text class="detail-label">报修类型</text>
+          <text class="detail-value">{{currentOrder.repairType}}</text>
+        </view>
+
+        <view class="detail-row">
+          <text class="detail-label">订单状态</text>
+          <view class="detail-badge" style="background-color: {{currentOrder.statusInfo.bgColor}}; color: {{currentOrder.statusInfo.color}};">
+            {{currentOrder.statusInfo.text}}
+          </view>
+        </view>
+
+        <view class="detail-row">
+          <text class="detail-label">位置</text>
+          <text class="detail-value">{{currentOrder.building}} {{currentOrder.roomNumber}}</text>
+        </view>
+
+        <view class="detail-row">
+          <text class="detail-label">联系电话</text>
+          <text class="detail-value">{{currentOrder.contactPhone}}</text>
+        </view>
+
+        <view class="detail-row">
+          <text class="detail-label">报修时间</text>
+          <text class="detail-value">{{currentOrder.createdAtFormatted}}</text>
+        </view>
+
+        <view class="detail-block" wx:if="{{currentOrder.description}}">
+          <text class="detail-label">问题描述</text>
+          <text class="detail-desc">{{currentOrder.description}}</text>
+        </view>
+
+        <view class="detail-block" wx:if="{{currentOrder.images && currentOrder.images.length > 0}}">
+          <text class="detail-label">报修图片</text>
+          <view class="detail-images">
+            <image
+              class="detail-img"
+              wx:for="{{currentOrder.images}}"
+              wx:for-item="img"
+              wx:key="imageId"
+              src="{{img.imageUrl}}"
+              mode="aspectFill"
+              data-url="{{img.imageUrl}}"
+              data-urls="{{currentOrder.images.map(i => i.imageUrl)}}"
+              bindtap="onPreviewImage"
+            />
+          </view>
+        </view>
+
+        <view class="detail-block" wx:if="{{currentOrder.completionImages && currentOrder.completionImages.length > 0}}">
+          <text class="detail-label">完成图片</text>
+          <view class="detail-images">
+            <image
+              class="detail-img"
+              wx:for="{{currentOrder.completionImages}}"
+              wx:for-item="img"
+              wx:key="imageId"
+              src="{{img.imageUrl}}"
+              mode="aspectFill"
+              data-url="{{img.imageUrl}}"
+              data-urls="{{currentOrder.completionImages.map(i => i.imageUrl)}}"
+              bindtap="onPreviewImage"
+            />
+          </view>
+        </view>
+
+        <view class="detail-block evaluation-block" wx:if="{{currentOrder.evaluation}}">
+          <text class="detail-label">我的评价</text>
+          <view class="evaluation-display">
+            <view class="star-display">
+              <text class="star filled" wx:for="{{[1,2,3,4,5]}}" wx:key="*this" wx:if="{{item <= currentOrder.evaluation.rating}}">★</text>
+              <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="*this" wx:if="{{item > currentOrder.evaluation.rating}}">★</text>
+            </view>
+            <text class="evaluation-content">{{currentOrder.evaluation.comment || currentOrder.evaluation.content}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="modal-footer" wx:if="{{currentOrder && currentOrder.status === 'completed' && !currentOrder.evaluation}}">
+      <button class="eval-btn" bindtap="onGoToEvaluation">去评价</button>
+    </view>
+    <view class="modal-footer evaluated" wx:if="{{currentOrder && currentOrder.status === 'completed' && currentOrder.evaluation}}">
+      <text class="evaluated-text">已完成评价</text>
+    </view>
+  </view>
+</view>

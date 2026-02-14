@@ -1,1 +1,82 @@
-<view></view>
+<view class="container">
+  <!-- User Info Header -->
+  <view class="user-header">
+    <view class="user-info">
+      <view class="avatar">
+        <text class="avatar-text">{{userInfo.realName ? userInfo.realName[0] : '学'}}</text>
+      </view>
+      <view class="user-detail">
+        <text class="user-name">{{userInfo.realName || '同学'}}</text>
+        <text class="user-room" wx:if="{{userInfo.building && userInfo.roomNumber}}">{{userInfo.building}} {{userInfo.roomNumber}}</text>
+        <text class="user-room" wx:else>请先完善个人信息</text>
+      </view>
+    </view>
+    <view class="logout-btn" bindtap="handleLogout">
+      <text class="logout-icon">退出</text>
+    </view>
+  </view>
+
+  <!-- Announcements Carousel -->
+  <view class="section">
+    <view class="section-title">
+      <text class="title-icon">📢</text>
+      <text>最新公告</text>
+    </view>
+    
+    <view class="announcement-carousel" wx:if="{{announcements.length > 0}}">
+      <swiper class="swiper" autoplay="true" interval="5000" duration="500" circular="true" bindchange="onSwiperChange">
+        <swiper-item wx:for="{{announcements}}" wx:key="announcementId" bindtap="viewAnnouncement" data-index="{{index}}">
+          <view class="announcement-item">
+            <view class="announcement-badge">NEW</view>
+            <text class="announcement-title">{{item.title}}</text>
+            <text class="announcement-date">{{item.createdAt}}</text>
+          </view>
+        </swiper-item>
+      </swiper>
+      <view class="swiper-dots">
+        <view wx:for="{{announcements}}" wx:key="*this" class="dot {{currentSwiper === index ? 'active' : ''}}"></view>
+      </view>
+    </view>
+    
+    <view class="empty-state" wx:if="{{!loading && announcements.length === 0}}">
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">暂无公告</text>
+    </view>
+  </view>
+
+  <!-- Quick Actions Grid -->
+  <view class="section">
+    <view class="section-title">
+      <text class="title-icon">⚡</text>
+      <text>快捷功能</text>
+    </view>
+    
+    <view class="action-grid">
+      <view class="action-item primary" bindtap="goToRepair">
+        <view class="action-icon repair">🔧</view>
+        <text class="action-name">我要报修</text>
+        <text class="action-desc">快速提交维修申请</text>
+      </view>
+      
+      <view class="action-item" bindtap="goToRecords">
+        <view class="action-icon records">📋</view>
+        <text class="action-name">报修记录</text>
+        <text class="action-desc">查看历史订单</text>
+      </view>
+      
+      <view class="action-item" bindtap="goToEvaluation">
+        <view class="action-icon evaluation">⭐</view>
+        <text class="action-name">服务评价</text>
+        <text class="action-desc">评价维修服务</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Tips Section -->
+  <view class="tips-section">
+    <view class="tips-card">
+      <text class="tips-title">💡 温馨提示</text>
+      <text class="tips-content">遇到宿舍设施问题请及时报修，我们会尽快安排维修人员处理。紧急情况请拨打宿管电话。</text>
+    </view>
+  </view>
+</view>

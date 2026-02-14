@@ -1,1 +1,5 @@
-{}
+{
+  "navigationBarTitleText": "管理员首页",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#faf8f5"
+}

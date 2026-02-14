@@ -1,1 +1,158 @@
-<view></view>
+<view class="container">
+  <view class="header">
+    <view class="header-title">我的评价</view>
+    <view class="header-subtitle">查看所有服务评价</view>
+  </view>
+
+  <view class="stats-bar">
+    <view class="stat-item">
+      <text class="stat-value">{{evaluations.length}}</text>
+      <text class="stat-label">总评价</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{evaluations.filter(item => item.rating >= 4).length}}</text>
+      <text class="stat-label">好评</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{evaluations.filter(item => item.rating === 5).length}}</text>
+      <text class="stat-label">五星</text>
+    </view>
+  </view>
+
+  <view class="filter-bar">
+    <view 
+      class="filter-item {{currentFilter === item.key ? 'active' : ''}}"
+      wx:for="{{filterOptions}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="onFilterChange"
+    >
+      <text class="filter-text">{{item.label}}</text>
+    </view>
+  </view>
+
+  <scroll-view
+    class="content"
+    scroll-y="true"
+    refresher-enabled="true"
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onPullDownRefresh"
+  >
+    <view class="evaluation-list">
+      <view 
+        class="evaluation-card" 
+        wx:for="{{filteredEvaluations}}" 
+        wx:key="evaluationId"
+        data-id="{{item.evaluationId}}"
+        bindtap="onViewDetail"
+      >
+        <view class="card-header">
+          <view class="order-info">
+            <text class="order-id">#{{item.orderId}}</text>
+            <text class="user-name">{{item.username || '用户'}}</text>
+          </view>
+          <view class="rating-badge rating-{{item.rating}}">
+            <text class="rating-text">{{item.rating}}分</text>
+          </view>
+        </view>
+
+        <view class="card-body">
+          <view class="rating-display">
+            <view class="stars">
+              <text 
+                class="star {{index < item.rating ? 'filled' : ''}}"
+                wx:for="[1,2,3,4,5]"
+                wx:key="*this"
+              >★</text>
+            </view>
+            <text class="rating-label">{{item.ratingLabel}}</text>
+          </view>
+          
+          <view class="content-preview" wx:if="{{item.content}}">
+            <text class="content-text">{{item.content}}</text>
+          </view>
+        </view>
+
+        <view class="card-footer">
+          <text class="eval-time">{{item.createdAtFormatted}}</text>
+          <view class="view-detail">
+            <text class="view-text">查看详情</text>
+            <text class="view-arrow">›</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{filteredEvaluations.length === 0 && !loading}}">
+      <view class="empty-icon">⭐</view>
+      <text class="empty-text">{{currentFilter === 'all' ? '暂无评价' : '暂无该星级评价'}}</text>
+      <text class="empty-subtext" wx:if="{{currentFilter === 'all'}}">学生完成报修后可对服务进行评价</text>
+    </view>
+
+    <view class="loading-state" wx:if="{{loading}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+  </scroll-view>
+</view>
+
+<view class="modal-overlay" wx:if="{{showDetailModal}}" bindtap="onCloseDetail">
+  <view class="modal-container" catchtap="preventClose">
+    <view class="modal-header">
+      <view class="modal-header-left">
+        <text class="modal-title">评价详情</text>
+        <view class="modal-order-id" wx:if="{{currentEvaluation}}">
+          <text>订单 #{{currentEvaluation.orderId}}</text>
+        </view>
+      </view>
+      <view class="close-btn" bindtap="onCloseDetail">✕</view>
+    </view>
+
+    <view class="modal-body" wx:if="{{currentEvaluation}}">
+      <view class="detail-section">
+        <view class="detail-row">
+          <text class="detail-label">用户</text>
+          <text class="detail-value">{{currentEvaluation.username || '未知用户'}}</text>
+        </view>
+        
+        <view class="detail-row">
+          <text class="detail-label">评分</text>
+          <view class="detail-rating">
+            <view class="stars large">
+              <text 
+                class="star {{index < currentEvaluation.rating ? 'filled' : ''}}"
+                wx:for="[1,2,3,4,5]"
+                wx:key="*this"
+              >★</text>
+            </view>
+            <text class="rating-score">{{currentEvaluation.rating}}分</text>
+          </view>
+        </view>
+        
+        <view class="detail-row">
+          <text class="detail-label">评价等级</text>
+          <text class="detail-value rating-label-{{currentEvaluation.rating}}">{{currentEvaluation.ratingLabel}}</text>
+        </view>
+        
+        <view class="detail-row">
+          <text class="detail-label">评价时间</text>
+          <text class="detail-value">{{currentEvaluation.createdAtFormatted}}</text>
+        </view>
+      </view>
+      
+      <view class="content-section" wx:if="{{currentEvaluation.content}}">
+        <text class="section-title">评价内容</text>
+        <view class="content-box">
+          <text class="content-full">{{currentEvaluation.content}}</text>
+        </view>
+      </view>
+      
+      <view class="content-section empty-content" wx:if="{{!currentEvaluation.content}}">
+        <text class="section-title">评价内容</text>
+        <text class="no-content-text">用户未填写文字评价</text>
+      </view>
+    </view>
+  </view>
+</view>
