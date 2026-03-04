@@ -101,14 +101,14 @@
 ### Definition of Done
 - [ ] 所有数据库迁移SQL执行成功
 - [ ] 现有admin全部升级为super_admin
-- [ ] 15+ API接口功能完整 + TDD测试通过
+- [x] 15+ API接口功能完整 + TDD测试通过
 - [ ] 10+ 小程序页面UI完成 + 交互正常
-- [ ] Excel导入功能正常（≤5000行）
-- [ ] 催单功能：6小时限制 + 列表标记
-- [ ] 撤单功能：仅pending可撤
-- [ ] 双向评价：7天窗口 + 顺序控制
-- [ ] `npm test` 全部通过
-- [ ] Git提交：atomic commits with clear messages
+- [x] Excel导入功能正常（≤5000行）
+- [x] 催单功能：6小时限制 + 列表标记
+- [x] 撤单功能：仅pending可撤
+- [x] 双向评价：7天窗口 + 顺序控制
+- [x] `npm test` 全部通过
+- [x] Git提交：atomic commits with clear messages
 
 ### Must Have
 1. 三角色系统完整运行（student/repairman/super_admin）
@@ -226,7 +226,7 @@ Max Concurrent: 5 (Wave 1)
 > EVERY task MUST have: Recommended Agent Profile + Parallelization info + QA Scenarios.
 > **A task WITHOUT QA Scenarios is INCOMPLETE. No exceptions.**
 
-- [ ] 1. Jest测试框架搭建
+- [x] 1. Jest测试框架搭建
 
   **What to do**:
   - 初始化Jest测试框架: `npm install --save-dev jest supertest`
@@ -319,7 +319,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 2. 数据库迁移 - users表扩展
+- [x] 2. 数据库迁移 - users表扩展
 
   **What to do**:
   - 创建迁移文件: `server/sql/migrations/001_multi_role_system.sql`
@@ -419,7 +419,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 3. 数据库迁移 - residents表创建
+- [x] 3. 数据库迁移 - residents表创建
 
   **What to do**:
   - 创建迁移文件: `server/sql/migrations/002_residents_table.sql`
@@ -527,7 +527,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 4. 数据库迁移 - repairOrders和evaluations表扩展
+- [x] 4. 数据库迁移 - repairOrders和evaluations表扩展
 
   **What to do**:
   - 创建迁移文件: `server/sql/migrations/003_order_enhancements.sql`
@@ -593,7 +593,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 5. 中间件权限扩展
+- [x] 5. 中间件权限扩展
 
   **What to do**:
   - 扩展`server/middleware/auth.js`的authorize函数
@@ -650,7 +650,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 6. 注册验证API（匹配residents表）
+- [x] 6. 注册验证API（匹配residents表）
 
   **What to do**:
   - 扩展`server/controllers/authController.js`的register函数
@@ -714,7 +714,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 7. 密码重置API（简化版邮箱验证）
+- [x] 7. 密码重置API（简化版邮箱验证）
 
   **What to do**:
   - 扩展`server/controllers/authController.js`
@@ -776,7 +776,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 8. 维修工管理API（CRUD）
+- [x] 8. 维修工管理API（CRUD）
 
   **What to do**:
   - 创建`server/controllers/repairmanController.js`
@@ -846,7 +846,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 9. 住户管理API（CRUD）
+- [x] 9. 住户管理API（CRUD）
 
   **What to do**:
   - 创建`server/controllers/residentController.js`
@@ -912,7 +912,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 10. Excel导入API（批量住户导入）
+- [x] 10. Excel导入API（批量住户导入）
 
   **What to do**:
   - 扩展`server/controllers/residentController.js`
@@ -992,7 +992,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 11. 催单功能API（6小时限制）
+- [x] 11. 催单功能API（6小时限制）
 
   **What to do**:
   - 扩展`server/controllers/orderController.js`
@@ -1060,7 +1060,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 12. 撤单功能API（仅pending）
+- [x] 12. 撤单功能API（仅pending）
 
   **What to do**:
   - 扩展`server/controllers/orderController.js`
@@ -1126,7 +1126,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 13. 订单列表增强（催促标记筛选）
+- [x] 13. 订单列表增强（催促标记筛选）
 
   **What to do**:
   - 扩展`server/controllers/adminController.js`的getAllOrders
@@ -1186,7 +1186,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 14. 双向评价API（先住户后维修工）
+- [x] 14. 双向评价API（先住户后维修工）
 
   **What to do**:
   - 扩展`server/controllers/orderController.js`
@@ -1270,7 +1270,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 15. 注册页面改造（验证UI）
+- [x] 15. 注册页面改造（验证UI）
 
   **What to do**:
   - 扩展`mini-program/pages/auth/register/`页面
@@ -1335,7 +1335,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 16. 超管-维修工管理页
+- [x] 16. 超管-维修工管理页
 
   **What to do**:
   - 创建`mini-program/pages/admin/repairman/`页面
@@ -1390,7 +1390,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 17. 超管-住户管理页（Excel导入）
+- [x] 17. 超管-住户管理页（Excel导入）
 
   **What to do**:
   - 创建`mini-program/pages/admin/resident/`页面
@@ -1454,7 +1454,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 18. 订单详情页增强（催单+撤单+评价）
+- [x] 18. 订单详情页增强（催单+撤单+评价）
 
   **What to do**:
   - 扩展`mini-program/pages/order/detail/`页面
@@ -1536,7 +1536,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] 19. 维修工专用页面（接单+完成+评价）
+- [x] 19. 维修工专用页面（接单+完成+评价）
 
   **What to do**:
   - 创建`mini-program/pages/repairman/`目录
@@ -1617,7 +1617,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] F1. **Plan Compliance Audit** — `oracle`
+- [x] F1. **Plan Compliance Audit** — `oracle`
 
   **What to do**:
   - Read the plan end-to-end (`.sisyphus/plans/dorm-repair-enhancement.md`)
@@ -1682,7 +1682,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] F2. **Code Quality Review** — `unspecified-high`
+- [x] F2. **Code Quality Review** — `unspecified-high`
 
   **What to do**:
   - Run `npm test` and verify all tests pass
@@ -1751,7 +1751,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] F3. **Integration Testing** — `unspecified-high`
+- [x] F3. **Integration Testing** — `unspecified-high`
 
   **What to do**:
   - Start from clean database state (run migrations on test DB)
@@ -1829,7 +1829,7 @@ Max Concurrent: 5 (Wave 1)
 
 ---
 
-- [ ] F4. **Scope Fidelity Check** — `deep`
+- [x] F4. **Scope Fidelity Check** — `deep`
 
   **What to do**:
   - For each task (1-19): read "What to do" section, read actual implementation (git diff or file content)
