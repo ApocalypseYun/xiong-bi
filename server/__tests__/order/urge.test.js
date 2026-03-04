@@ -135,11 +135,11 @@ describe('POST /api/orders/:id/urge', () => {
         .set('Authorization', `Bearer ${studentToken}`);
 
       expect(res.status).toBe(200);
-      expect(res.body.success).toBe(true);
+      expect(res.body.code).toBe(200);
       expect(res.body.message).toBe('催单成功');
       expect(res.body.data).toMatchObject({
         orderId: testOrderId,
-        is_urge: true
+        is_urge: 1
       });
       expect(res.body.data.urge_time).toBeDefined();
 
@@ -160,7 +160,7 @@ describe('POST /api/orders/:id/urge', () => {
         .set('Authorization', `Bearer ${studentToken}`);
 
       expect(res.status).toBe(404);
-      expect(res.body.success).toBe(false);
+      expect(res.body.code).toBe(res.status);
       expect(res.body.message).toMatch(/不存在或无权访问/);
     });
 
@@ -178,7 +178,7 @@ describe('POST /api/orders/:id/urge', () => {
         .set('Authorization', `Bearer ${studentToken}`);
 
       expect(res.status).toBe(404);
-      expect(res.body.success).toBe(false);
+      expect(res.body.code).toBe(res.status);
       expect(res.body.message).toMatch(/不存在或无权访问/);
 
       // 清理
@@ -199,7 +199,7 @@ describe('POST /api/orders/:id/urge', () => {
         .set('Authorization', `Bearer ${studentToken}`);
 
       expect(res.status).toBe(400);
-      expect(res.body.success).toBe(false);
+      expect(res.body.code).toBe(res.status);
       expect(res.body.message).toMatch(/只能催单待处理状态的订单/);
 
       // 清理
@@ -220,7 +220,7 @@ describe('POST /api/orders/:id/urge', () => {
         .set('Authorization', `Bearer ${studentToken}`);
 
       expect(res.status).toBe(400);
-      expect(res.body.success).toBe(false);
+      expect(res.body.code).toBe(res.status);
       expect(res.body.message).toMatch(/订单创建不足6小时，暂时无法催单/);
 
       // 清理
@@ -241,7 +241,7 @@ describe('POST /api/orders/:id/urge', () => {
         .set('Authorization', `Bearer ${studentToken}`);
 
       expect(res.status).toBe(400);
-      expect(res.body.success).toBe(false);
+      expect(res.body.code).toBe(res.status);
       expect(res.body.message).toMatch(/该订单已催单，请勿重复操作/);
 
       // 清理

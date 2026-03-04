@@ -262,7 +262,7 @@ const repairmanEvaluate = async (req, res) => {
     }
 
     // 验证必填字段
-    if (!rating) {
+    if (rating === null || rating === undefined) {
       return error(res, '评分不能为空', 400);
     }
 

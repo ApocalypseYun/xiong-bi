@@ -124,3 +124,157 @@ server/
 - 不发送真实邮件（简化版）
 - 必须 4 个字段全部匹配
 - 密码长度最少 6 位
+
+---
+
+## 2026-03-04 - Task 4: 扩展注册功能验证居民信息
+
+### 实现总结
+扩展 `server/controllers/authController.js` 的 `register` 函数，实现基于 residents 表的 5 字段验证：
+- **验证字段**: username (学号) + realName + phone + building + roomNumber
+- **验证逻辑**: 查询 residents 表，逐个比对 5 个字段
+- **成功返回**: 200 + 创建 user (role='student')
+- **验证失败**: 400 + { mismatchedFields: [...] }
+- **重复注册**: 409 + "该学号已注册，请直接登录"
+
+### 技术要点
+
+1. **字段映射关系**
+   ```
+   residents 表          →  users 表
+   student_id (学号)     →  username
+   name                  →  realName
+   phone                 →  phone
+   building              →  building
+   room_number           →  roomNumber
+   ```
+
+2. **验证顺序**
+   - 先验证学号存在于 residents 表
+   - 再逐个比对其他 4 个字段
+   - 收集所有不匹配的字段（mismatchedFields）
+   - 最后检查是否已注册
+
+3. **安全性**
+   - 强制 role='student'，忽略用户传入的 role 参数
+   - 密码使用 bcrypt 加密
+   - email 字段可选
+
+4. **错误处理**
+   - 返回具体的 mismatchedFields 数组，便于前端提示
+   - 区分"学号不存在"和"字段不匹配"
+   - 区分"验证失败"(400) 和"已注册"(409)
+
+### 测试策略（TDD）
+
+1. **测试优先**：先写测试，再实现功能
+2. **测试覆盖**：
+   - 成功场景：2 个测试（基础注册 + 可选 email）
+   - 验证失败：6 个测试（单个字段、多个字段、学号不存在）
+   - 重复注册：1 个测试
+   - 输入验证：3 个测试（必填字段、密码匹配、密码长度）
+   - 角色强制：2 个测试（强制 student、忽略 admin/super_admin）
+
+3. **测试数据管理**
+   - beforeAll: 插入测试 resident 到 residents 表
+   - afterAll: 清理 users 和 residents 表
+   - beforeEach: 清理已注册用户（避免测试干扰）
+
+### 测试结果
+- ✅ 14/14 测试全部通过
+- ✅ authController.js 覆盖率: 86.3% statements, 90.9% branches
+- ✅ 所有 auth 测试（23个）全部通过
+
+### 关键文件
+- `server/controllers/authController.js` - register 函数实现
+- `server/__tests__/auth/register-resident-validation.test.js` - 14 个测试用例
+
+### 依赖关系
+- 依赖 residents 表（Migration 002）
+- residents 表由 super_admin 通过 Excel 导入
+
+### API 契约
+
+**POST /api/auth/register**
+
+Request:
+```json
+{
+  "username": "2024999",         // 学号（必填）
+  "password": "password123",      // 必填，最少6位
+  "confirmPassword": "password123",
+  "realName": "测试住户",          // 必填
+  "phone": "13900139000",        // 必填
+  "building": "测试楼",           // 必填
+  "roomNumber": "999",           // 必填
+  "email": "test@example.com"    // 可选
+}
+```
+
+Success Response (200):
+```json
+{
+  "code": 200,
+  "message": "注册成功",
+  "data": {
+    "userId": 123,
+    "username": "2024999",
+    "role": "student"
+  }
+}
+```
+
+Validation Error (400):
+```json
+{
+  "code": 400,
+  "message": "验证信息不匹配",
+  "data": {
+    "mismatchedFields": ["realName", "phone"]
+  }
+}
+```
+
+Duplicate Error (409):
+```json
+{
+  "code": 409,
+  "message": "该学号已注册，请直接登录"
+}
+```
+
+### 后续任务
+- Task 5: super_admin 导入 residents 表（Excel 上传）
+- Task 6+: 使用注册功能创建用户
+
+## 2026-03-04: 维修工评价接口实现
+
+### 实现内容
+- **新增接口**: POST /api/orders/:id/repairman-evaluate
+- **功能**: 维修工对住户进行双向评价（住户先评，维修工后评）
+- **测试覆盖**: 12 个测试用例全部通过
+
+### 关键验证逻辑
+1. **权限验证**: 只有 `repairman` 和 `super_admin` 角色可以评价
+2. **订单状态**: 必须是 `completed` 状态
+3. **维修工身份**: 必须是该订单的 `adminId`（接单的维修工）
+4. **评价顺序**: 住户必须先评价（evaluations.rating IS NOT NULL）
+5. **时间窗口**: 距离住户评价时间不超过 7 天
+6. **防重复**: 维修工未评价（repairman_rating IS NULL）
+
+### 数据库字段
+- `evaluations.repairman_rating`: TINYINT (1-5)
+- `evaluations.repairman_comment`: TEXT
+- `evaluations.repairman_evaluated_at`: DATETIME
+
+### 踩坑记录
+1. **角色系统**: 数据库已通过 migration 001 扩展，最终角色为 `student`, `repairman`, `super_admin`（无 `admin`）
+2. **响应格式**: 项目使用 `{ code, message, data }` 而非 `{ success, message, data }`
+3. **评分验证**: `!rating` 会捕获 0，需改为 `rating === null || rating === undefined`
+4. **测试数据清理**: beforeAll 中需先清理可能存在的测试数据，避免重复键错误
+
+### 代码位置
+- **控制器**: `server/controllers/orderController.js` (repairmanEvaluate 函数，第 251-339 行)
+- **路由**: `server/routes/orders.js` (第 13 行)
+- **测试**: `server/__tests__/order/repairman-evaluate.test.js` (12 个测试用例)
+

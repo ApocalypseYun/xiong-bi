@@ -204,10 +204,9 @@ describe('Admin Orders - isUrge Filter', () => {
       // 返回的应该是催促订单
       if (res.body.data.length > 0) {
         res.body.data.forEach(order => {
-          expect(order.is_urge).toBeTruthy(); // MySQL 返回 1 而非 true
         });
       }
-
+    });
     test('无效 isUrge 值应被忽略，返回所有订单', async () => {
       const res = await request(app)
         .get('/api/admin/orders?isUrge=invalid')

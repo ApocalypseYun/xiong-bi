@@ -35,6 +35,11 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
   };
 
   beforeAll(async () => {
+    // 先清理可能存在的测试数据
+    await pool.execute('DELETE FROM evaluations WHERE orderId IN (SELECT orderId FROM repairOrders WHERE userId IN (SELECT userId FROM users WHERE username IN (?, ?, ?)))', [student.username, repairman.username, admin.username]);
+    await pool.execute('DELETE FROM repairOrders WHERE userId IN (SELECT userId FROM users WHERE username IN (?, ?, ?))', [student.username, repairman.username, admin.username]);
+    await pool.execute('DELETE FROM users WHERE username IN (?, ?, ?)', [student.username, repairman.username, admin.username]);
+
     // 创建测试用户
     const hashedStudentPassword = await bcrypt.hash(student.password, 10);
     const [studentResult] = await pool.execute(
@@ -102,7 +107,7 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
         });
 
       expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
+      expect(response.body).toHaveProperty('code', 200);
       expect(response.body.message).toBe('评价成功');
       expect(response.body.data.orderId).toBe(testOrderId);
       expect(response.body.data.rating).toBe(4);
@@ -141,7 +146,7 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
         });
 
       expect(response.status).toBe(200);
-      expect(response.body.success).toBe(true);
+      expect(response.body).toHaveProperty('code', 200);
 
       // 清理
       await pool.execute('DELETE FROM evaluations WHERE orderId = ?', [adminOrderId]);
@@ -160,7 +165,7 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
         });
 
       expect(response.status).toBe(404);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toHaveProperty('code', response.status);
       expect(response.body.message).toBe('订单不存在');
     });
 
@@ -168,7 +173,7 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
       const [orderResult] = await pool.execute(
         `INSERT INTO repairOrders (userId, repairType, building, roomNumber, contactPhone, description, status)
          VALUES (?, ?, ?, ?, ?, ?, 'processing')`,
-        [testStudentId, '窗户', '3栋', '303', '13800138002', '窗户损坏', testRepairmanId]
+        [testStudentId, '窗户', '3栋', '303', '13800138002', '窗户损坏']
       );
       const orderId = orderResult.insertId;
 
@@ -181,7 +186,7 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toHaveProperty('code', response.status);
       expect(response.body.message).toBe('只能评价已完成的订单');
 
       await pool.execute('DELETE FROM repairOrders WHERE orderId = ?', [orderId]);
@@ -210,7 +215,7 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
         });
 
       expect(response.status).toBe(403);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toHaveProperty('code', response.status);
       expect(response.body.message).toBe('无权评价该订单');
 
       await pool.execute('DELETE FROM evaluations WHERE orderId = ?', [orderId]);
@@ -234,7 +239,7 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toHaveProperty('code', response.status);
       expect(response.body.message).toBe('住户尚未评价，请等待住户评价后再评价');
 
       await pool.execute('DELETE FROM repairOrders WHERE orderId = ?', [orderId]);
@@ -264,7 +269,7 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toHaveProperty('code', response.status);
       expect(response.body.message).toBe('评价时间已超过7天，无法评价');
 
       await pool.execute('DELETE FROM evaluations WHERE orderId = ?', [orderId]);
@@ -294,7 +299,7 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toHaveProperty('code', response.status);
       expect(response.body.message).toBe('该订单已评价，不能重复评价');
 
       await pool.execute('DELETE FROM evaluations WHERE orderId = ?', [orderId]);
@@ -308,7 +313,7 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
         .send({});
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toHaveProperty('code', response.status);
       expect(response.body.message).toBe('评分不能为空');
     });
 
@@ -322,7 +327,7 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toHaveProperty('code', response.status);
       expect(response.body.message).toBe('评分必须在1-5之间');
     });
 
@@ -336,7 +341,7 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toHaveProperty('code', response.status);
       expect(response.body.message).toBe('评分必须在1-5之间');
     });
 
@@ -350,8 +355,8 @@ describe('Repairman Evaluation API - POST /api/orders/:id/repairman-evaluate', (
         });
 
       expect(response.status).toBe(403);
-      expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('无权限');
+      expect(response.body).toHaveProperty('code', response.status);
+      expect(response.body.message).toBe('Insufficient permissions');
     });
   });
 });

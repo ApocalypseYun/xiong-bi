@@ -61,7 +61,7 @@ const register = async (req, res) => {
     );
 
     if (existingUsers.length > 0) {
-      return error(res, '该学号已注册', 409);
+      return error(res, '该学号已注册，请直接登录', 409);
     }
 
     // 加密密码
