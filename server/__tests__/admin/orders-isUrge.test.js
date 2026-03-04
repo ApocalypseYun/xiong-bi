@@ -7,10 +7,12 @@
  */
 const request = require('supertest');
 const app = require('../../app');
-const pool = require('../../config/database');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../../middleware/auth');
+
+// 使用测试数据库（在 beforeAll 中初始化）
+let pool;
 
 describe('Admin Orders - isUrge Filter', () => {
   let adminToken;
@@ -20,6 +22,12 @@ describe('Admin Orders - isUrge Filter', () => {
   let studentId;
 
   beforeAll(async () => {
+    // 初始化测试数据库连接
+    pool = global.__TEST_DB__;
+    
+    // 确保使用测试数据库
+    process.env.DB_NAME = process.env.DB_TEST_NAME || 'dormitory_repair_test';
+    
     // 获取或创建测试管理员 - 尝试使用 'admin' 角色（旧 schema）或 'super_admin'（新 schema）
     const [existingAdmin] = await pool.execute(
       "SELECT userId, username, role FROM users WHERE role IN ('admin', 'super_admin') LIMIT 1"
@@ -104,6 +112,10 @@ describe('Admin Orders - isUrge Filter', () => {
   });
 
   afterAll(async () => {
+    // 使用全局测试数据库连接
+    pool = global.__TEST_DB__;
+    
+    // 清理测试数据
     // 清理测试数据
     if (testOrderId) {
       await pool.execute('DELETE FROM orderImages WHERE orderId = ?', [testOrderId]);
@@ -111,7 +123,7 @@ describe('Admin Orders - isUrge Filter', () => {
       await pool.execute('DELETE FROM repairOrders WHERE orderId = ?', [testOrderId]);
     }
     
-    await pool.end();
+    // 注意：不关闭 pool 连接，由 setup.js 统一管理
   });
 
   describe('GET /api/admin/orders', () => {

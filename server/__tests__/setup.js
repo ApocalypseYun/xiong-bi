@@ -20,23 +20,7 @@ beforeAll(async () => {
   global.__TEST_DB__ = testPool;
   
   // Database connection will be verified when DB is configured
-  // try {
-  //   const connection = await testPool.getConnection();
-  //   console.log('✓ Test database connected successfully');
-  //   connection.release();
-  // } catch (error) {
-  //   console.error('✗ Failed to connect to test database:', error.message);
-  //   throw error;
-  // }
 });
-  // try {
-  //   const connection = await testPool.getConnection();
-  //   console.log('✓ Test database connected successfully');
-  //   connection.release();
-  // } catch (error) {
-  //   console.error('✗ Failed to connect to test database:', error.message);
-  //   throw error;
-  // }
 
 // Cleanup after each test
 afterEach(async () => {

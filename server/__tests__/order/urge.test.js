@@ -10,6 +10,9 @@
  * - 重复催单
  */
 
+// 确保测试使用测试数据库
+process.env.DB_NAME = process.env.DB_TEST_NAME || 'dormitory_repair_test';
+
 const request = require('supertest');
 const app = require('../../app');
 const mysql = require('mysql2/promise');
@@ -28,7 +31,7 @@ describe('POST /api/orders/:id/urge', () => {
       host: process.env.DB_HOST || 'localhost',
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_NAME || 'dormitory_repair'
+      database: process.env.DB_TEST_NAME || 'dormitory_repair_test'
     });
 
     // 先创建测试居民数据
