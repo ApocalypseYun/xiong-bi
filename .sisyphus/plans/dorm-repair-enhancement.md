@@ -682,10 +682,10 @@ Max Concurrent: 5 (Wave 1)
   - Draft文档: "注册时验证住户信息（学号+姓名+电话+栋数+寝室号）"
 
   **Acceptance Criteria**:
-  - [ ] POST /api/auth/register验证5字段匹配
-  - [ ] 匹配失败返回具体错误（哪些字段不匹配）
-  - [ ] 学号已注册返回409 Conflict
-  - [ ] 测试覆盖：验证成功、验证失败、重复注册
+  - [x] POST /api/auth/register验证5字段匹配
+  - [x] 匹配失败返回具体错误（哪些字段不匹配）
+  - [x] 学号已注册返回409 Conflict
+  - [x] 测试覆盖：验证成功、验证失败、重复注册
 
   **QA Scenarios**:
   ```
@@ -745,10 +745,10 @@ Max Concurrent: 5 (Wave 1)
   - Draft文档: "密码重置：验证邮箱+注册信息"
 
   **Acceptance Criteria**:
-  - [ ] POST /api/auth/reset-password验证4字段
-  - [ ] 验证失败返回401 Unauthorized
-  - [ ] 验证成功返回200 + 密码重置成功
-  - [ ] 测试覆盖：成功、失败、不存在的用户
+  - [x] POST /api/auth/reset-password验证4字段
+  - [x] 验证失败返回401 Unauthorized
+  - [x] 验证成功返回200 + 密码重置成功
+  - [x] 测试覆盖：成功、失败、不存在的用户
 
   **QA Scenarios**:
   ```
@@ -812,11 +812,11 @@ Max Concurrent: 5 (Wave 1)
   - Draft文档: "维修工管理（超管CRUD）"
 
   **Acceptance Criteria**:
-  - [ ] 4个CRUD接口全部实现
-  - [ ] 权限检查：非super_admin返回403
-  - [ ] 创建时role自动设为repairman
-  - [ ] 删除时检查未完成订单（有则拒绝）
-  - [ ] 测试覆盖：所有CRUD + 权限检查
+  - [x] 4个CRUD接口全部实现
+  - [x] 权限检查：非super_admin返回403
+  - [x] 创建时role自动设为repairman
+  - [x] 删除时检查未完成订单（有则拒绝）
+  - [x] 测试覆盖：所有CRUD + 权限检查
 
   **QA Scenarios**:
   ```
@@ -881,10 +881,10 @@ Max Concurrent: 5 (Wave 1)
   - Draft文档: "住户管理（超管CRUD + 搜索）"
 
   **Acceptance Criteria**:
-  - [ ] 4个CRUD接口全部实现
-  - [ ] 搜索接口支持studentId参数
-  - [ ] 删除时检查users表（已注册则拒绝）
-  - [ ] 测试覆盖：CRUD + 搜索 + 约束检查
+  - [x] 4个CRUD接口全部实现
+  - [x] 搜索接口支持studentId参数
+  - [x] 删除时检查users表（已注册则拒绝）
+  - [x] 测试覆盖：CRUD + 搜索 + 约束检查
 
   **QA Scenarios**:
   ```
