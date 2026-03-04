@@ -12,6 +12,7 @@
     "pages/admin-pending/admin-pending",
     "pages/admin-completed/admin-completed",
     "pages/admin-evaluations/admin-evaluations",
+    "pages/admin-announcements/admin-announcements",
     "pages/admin-repairman/admin-repairman",
     "pages/admin-resident/admin-resident",
     "pages/repairman/repairman"
