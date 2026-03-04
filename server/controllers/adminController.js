@@ -1,15 +1,16 @@
 const pool = require('../config/database');
 const { success, error } = require('../utils/response');
 
-// 获取所有订单（支持日期筛选）
+// 获取所有订单（支持日期筛选、催单筛选）
 const getAllOrders = async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate, isUrge } = req.query;
     
     let sql = `
       SELECT 
         o.orderId, o.userId, o.repairType, o.building, o.roomNumber, 
         o.contactPhone, o.description, o.status, o.adminId, 
+        o.is_urge, o.urge_time,
         o.completedAt, o.createdAt, o.updatedAt,
         u.username, u.realName as userRealName
       FROM repairOrders o
@@ -26,6 +27,13 @@ const getAllOrders = async (req, res) => {
     if (endDate) {
       sql += ' AND o.createdAt <= ?';
       params.push(endDate + ' 23:59:59');
+    }
+
+    // 催单筛选
+    if (isUrge === 'true') {
+      sql += ' AND o.is_urge = TRUE';
+    } else if (isUrge === 'false') {
+      sql += ' AND o.is_urge = FALSE';
     }
 
     sql += ' ORDER BY o.createdAt DESC';

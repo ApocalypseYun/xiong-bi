@@ -9,7 +9,7 @@ const {
 } = require('../controllers/adminController');
 
 router.use(authenticate);
-router.use(authorize(['admin']));
+router.use(authorize(['admin', 'super_admin']));
 
 router.get('/orders', getAllOrders);
 router.get('/orders/pending', getPendingOrders);
