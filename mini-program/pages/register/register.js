@@ -100,6 +100,15 @@ Page({
     return '';
   },
 
+  validateBuilding() {
+    const { building, role } = this.data;
+    if (role === 'admin') return '';
+    if (!building.trim()) {
+      return '请输入宿舍楼栋';
+    }
+    return '';
+  },
+
   validateRealName() {
     const { realName, role } = this.data;
     if (role === 'admin') return '';
