@@ -15,6 +15,7 @@ Page({
       { key: 'completed', label: '已完成' }
     ],
     currentTab: '',
+    currentTabLabel: '',
     orders: [],
     loading: false,
     refreshing: false,
@@ -36,8 +37,10 @@ Page({
 
   onTabChange(e) {
     const tab = e.currentTarget.dataset.tab;
+    const tabLabel = this.data.tabs.find(t => t.key === tab)?.label || '';
     this.setData({
       currentTab: tab,
+      currentTabLabel: tabLabel,
       orders: [],
       page: 1,
       hasMore: true
@@ -75,7 +78,9 @@ Page({
           const formattedOrders = orders.map(order => ({
             ...order,
             statusInfo: statusMap[order.status] || statusMap.pending,
-            createdAtFormatted: this.formatDate(order.createdAt)
+            createdAtFormatted: this.formatDate(order.createdAt),
+            previewImages: order.images ? order.images.slice(0, 3) : [],
+            imageUrls: order.images ? order.images.map(img => img.imageUrl) : []
           }));
 
           this.setData({
@@ -120,8 +125,14 @@ Page({
     const orderId = e.currentTarget.dataset.id;
     const order = this.data.orders.find(o => o.orderId === orderId);
     if (order) {
+      // 处理图片 URL 数组用于预览
+      const processedOrder = {
+        ...order,
+        imageUrls: order.images ? order.images.map(img => img.imageUrl) : [],
+        completionImageUrls: order.completionImages ? order.completionImages.map(img => img.imageUrl) : []
+      };
       this.setData({
-        currentOrder: order,
+        currentOrder: processedOrder,
         showDetailModal: true
       });
     }

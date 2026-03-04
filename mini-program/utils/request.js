@@ -8,7 +8,7 @@ const request = (options) => {
       data: options.data || {},
       header: {
         'Content-Type': 'application/json',
-        'Authorization': wx.getStorageSync('token') || ''
+        'Authorization': `Bearer ${wx.getStorageSync('token') || ''}`
       },
       success: (res) => {
         if (res.statusCode === 200) {

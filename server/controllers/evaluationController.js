@@ -77,7 +77,7 @@ const getMyEvaluations = async (req, res) => {
       `SELECT e.evaluationId, e.orderId, e.rating, e.content, e.createdAt,
               o.description as orderDescription
        FROM evaluations e
-       LEFT JOIN orders o ON e.orderId = o.orderId
+       LEFT JOIN repairOrders o ON e.orderId = o.orderId
        WHERE e.userId = ?
        ORDER BY e.createdAt DESC`,
       [userId]
@@ -99,7 +99,7 @@ const getAllEvaluations = async (req, res) => {
               o.description as orderDescription
        FROM evaluations e
        LEFT JOIN users u ON e.userId = u.userId
-       LEFT JOIN orders o ON e.orderId = o.orderId
+       LEFT JOIN repairOrders o ON e.orderId = o.orderId
        ORDER BY e.createdAt DESC`
     );
 

@@ -30,7 +30,7 @@ const createAnnouncement = async (req, res) => {
 
     // 创建公告
     const [result] = await pool.execute(
-      `INSERT INTO announcements (title, content, adminId, createdAt) 
+      `INSERT INTO announcements (title, content, publishedBy, createdAt) 
        VALUES (?, ?, ?, NOW())`,
       [title, content, adminId]
     );

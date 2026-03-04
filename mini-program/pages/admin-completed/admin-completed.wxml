@@ -87,7 +87,10 @@
         </view>
         
         <view class="evaluation-badge" wx:if="{{item.evaluation}}">
-          <text class="stars">{{'★'.repeat(item.evaluation.rating)}}{{item.evaluation.rating < 5 ? '☆'.repeat(5 - item.evaluation.rating) : ''}}</text>
+          <view class="stars">
+            <text class="star filled" wx:for="{{[1,2,3,4,5]}}" wx:key="*this" wx:if="{{item <= evaluation.rating}}">★</text>
+            <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="*this" wx:if="{{item > evaluation.rating}}">☆</text>
+          </view>
           <text class="has-eval">已评价</text>
         </view>
         
@@ -149,7 +152,7 @@
                 mode="aspectFill"
                 bindtap="previewImage"
                 data-url="{{item.imageUrl}}"
-                data-urls="{{currentOrder.images.map(img => img.imageUrl)}}"
+                data-urls="{{currentOrder.imageUrls}}"
               />
             </view>
           </view>
@@ -166,7 +169,7 @@
                 mode="aspectFill"
                 bindtap="previewImage"
                 data-url="{{item.imageUrl}}"
-                data-urls="{{currentOrder.completionImages.map(img => img.imageUrl)}}"
+                data-urls="{{currentOrder.completionImageUrls}}"
               />
             </view>
           </view>

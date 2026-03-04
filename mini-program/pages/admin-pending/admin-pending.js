@@ -46,7 +46,11 @@ Page({
     try {
       const res = await request.get('/admin/orders/pending');
       if (res.code === 200) {
-        this.setData({ orders: res.data || [] });
+        const orders = (res.data || []).map(order => ({
+          ...order,
+          imageUrls: order.images ? order.images.map(img => img.imageUrl) : []
+        }));
+        this.setData({ orders });
       } else {
         wx.showToast({
           title: res.message || '加载失败',
@@ -65,8 +69,13 @@ Page({
 
   showOrderDetail(e) {
     const { order } = e.currentTarget.dataset;
+    // 处理图片 URL 数组
+    const processedOrder = {
+      ...order,
+      imageUrls: order.images ? order.images.map(img => img.imageUrl) : []
+    };
     this.setData({
-      currentOrder: order,
+      currentOrder: processedOrder,
       showModal: true
     });
   },

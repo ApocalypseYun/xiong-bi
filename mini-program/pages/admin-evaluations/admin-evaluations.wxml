@@ -6,17 +6,17 @@
 
   <view class="stats-bar">
     <view class="stat-item">
-      <text class="stat-value">{{evaluations.length}}</text>
+      <text class="stat-value">{{stats.total}}</text>
       <text class="stat-label">总评价</text>
     </view>
     <view class="stat-divider"></view>
     <view class="stat-item">
-      <text class="stat-value">{{evaluations.filter(item => item.rating >= 4).length}}</text>
+      <text class="stat-value">{{stats.good}}</text>
       <text class="stat-label">好评</text>
     </view>
     <view class="stat-divider"></view>
     <view class="stat-item">
-      <text class="stat-value">{{evaluations.filter(item => item.rating === 5).length}}</text>
+      <text class="stat-value">{{stats.fiveStar}}</text>
       <text class="stat-label">五星</text>
     </view>
   </view>

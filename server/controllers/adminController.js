@@ -57,18 +57,23 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-// 获取待处理订单
+// 获取待处理订单（包括 pending 和 processing）
 const getPendingOrders = async (req, res) => {
   try {
     const [orders] = await pool.execute(`
       SELECT 
         o.orderId, o.userId, o.repairType, o.building, o.roomNumber, 
-        o.contactPhone, o.description, o.status, o.createdAt,
+        o.contactPhone, o.description, o.status, o.adminId, o.createdAt,
         u.username, u.realName as userRealName
       FROM repairOrders o
       LEFT JOIN users u ON o.userId = u.userId
-      WHERE o.status = 'pending'
-      ORDER BY o.createdAt ASC
+      WHERE o.status IN ('pending', 'processing')
+      ORDER BY 
+        CASE o.status 
+          WHEN 'pending' THEN 1 
+          WHEN 'processing' THEN 2 
+        END,
+        o.createdAt ASC
     `);
 
     // 获取每个订单的图片

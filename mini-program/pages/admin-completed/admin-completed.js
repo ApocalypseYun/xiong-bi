@@ -68,7 +68,11 @@ Page({
       });
       
       if (res.code === 200) {
-        const completedOrders = (res.data || []).filter(order => order.status === 'completed');
+        const completedOrders = (res.data || []).filter(order => order.status === 'completed').map(order => ({
+          ...order,
+          imageUrls: order.images ? order.images.map(img => img.imageUrl) : [],
+          completionImageUrls: order.completionImages ? order.completionImages.map(img => img.imageUrl) : []
+        }));
         this.setData({ orders: completedOrders });
       } else {
         wx.showToast({
@@ -115,8 +119,14 @@ Page({
 
   showOrderDetail(e) {
     const { order } = e.currentTarget.dataset;
+    // 处理图片 URL 数组
+    const processedOrder = {
+      ...order,
+      imageUrls: order.images ? order.images.map(img => img.imageUrl) : [],
+      completionImageUrls: order.completionImages ? order.completionImages.map(img => img.imageUrl) : []
+    };
     this.setData({
-      currentOrder: order,
+      currentOrder: processedOrder,
       showModal: true
     });
   },

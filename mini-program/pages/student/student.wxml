@@ -1,6 +1,6 @@
 <view class="container">
   <!-- User Info Header -->
-  <view class="user-header">
+  <view class="user-header" bindtap="goToProfile">
     <view class="user-info">
       <view class="avatar">
         <text class="avatar-text">{{userInfo.realName ? userInfo.realName[0] : '学'}}</text>
@@ -8,10 +8,10 @@
       <view class="user-detail">
         <text class="user-name">{{userInfo.realName || '同学'}}</text>
         <text class="user-room" wx:if="{{userInfo.building && userInfo.roomNumber}}">{{userInfo.building}} {{userInfo.roomNumber}}</text>
-        <text class="user-room" wx:else>请先完善个人信息</text>
+        <text class="user-room hint" wx:else>点击完善个人信息 ›</text>
       </view>
     </view>
-    <view class="logout-btn" bindtap="handleLogout">
+    <view class="logout-btn" catchtap="handleLogout">
       <text class="logout-icon">退出</text>
     </view>
   </view>

@@ -22,7 +22,12 @@ Page({
       { key: '2', label: '2星' },
       { key: '1', label: '1星' }
     ],
-    filteredEvaluations: []
+    filteredEvaluations: [],
+    stats: {
+      total: 0,
+      good: 0,
+      fiveStar: 0
+    }
   },
 
   onLoad() {
@@ -50,8 +55,16 @@ Page({
             createdAtFormatted: this.formatDate(item.createdAt)
           }));
 
+          // 计算统计数据
+          const stats = {
+            total: evaluations.length,
+            good: evaluations.filter(item => item.rating >= 4).length,
+            fiveStar: evaluations.filter(item => item.rating === 5).length
+          };
+
           this.setData({ 
             evaluations,
+            stats,
             loading: false,
             refreshing: false
           }, () => {

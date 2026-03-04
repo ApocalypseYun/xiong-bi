@@ -7,6 +7,7 @@
     "pages/student-repair/student-repair",
     "pages/student-records/student-records",
     "pages/student-evaluation/student-evaluation",
+    "pages/student-profile/student-profile",
     "pages/admin/admin",
     "pages/admin-pending/admin-pending",
     "pages/admin-completed/admin-completed",

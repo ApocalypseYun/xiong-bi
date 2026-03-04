@@ -60,6 +60,10 @@
   padding: 6rpx 16rpx;
   border-radius: 20rpx;
 }
+.user-room.hint {
+  color: #8b6b5b;
+  font-style: italic;
+}
 
 .logout-btn {
   background: rgba(255, 255, 255, 0.6);

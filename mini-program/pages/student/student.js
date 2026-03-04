@@ -28,9 +28,29 @@ Page({
   },
 
   loadUserInfo() {
-    const userInfo = getUserInfo();
-    this.setData({ userInfo });
+    // 从服务器获取完整用户信息
+    get('/user/profile')
+      .then(res => {
+        if (res.code === 200) {
+          // 更新本地存储
+          const userInfo = res.data;
+          wx.setStorageSync('userInfo', userInfo);
+          this.setData({ userInfo });
+        } else {
+          // 如果请求失败，使用本地缓存
+          const userInfo = getUserInfo();
+          this.setData({ userInfo });
+        }
+      })
+      .catch(() => {
+        // 如果网络错误，使用本地缓存
+        const userInfo = getUserInfo();
+        this.setData({ userInfo });
+      });
   },
+
+
+
 
   loadAnnouncements() {
     this.setData({ loading: true });
@@ -82,6 +102,11 @@ Page({
   goToEvaluation() {
     wx.navigateTo({
       url: '/pages/student-evaluation/student-evaluation'
+    });
+  },
+  goToProfile() {
+    wx.navigateTo({
+      url: '/pages/student-profile/student-profile'
     });
   },
 

@@ -124,7 +124,7 @@
                 mode="aspectFill"
                 bindtap="previewImage"
                 data-url="{{item.imageUrl}}"
-                data-urls="{{currentOrder.images.map(img => img.imageUrl)}}"
+                data-urls="{{currentOrder.imageUrls}}"
               />
             </view>
           </view>
