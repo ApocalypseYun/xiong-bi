@@ -3,6 +3,13 @@ const { error } = require('../utils/response');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
+// Role configuration
+const ROLE_TYPES = {
+  STUDENT: 'student',
+  REPAIRMAN: 'repairman',
+  SUPER_ADMIN: 'super_admin'
+};
+
 const authenticate = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return error(res, 'Token required', 401);
@@ -23,4 +30,4 @@ const authorize = (roles) => (req, res, next) => {
   next();
 };
 
-module.exports = { authenticate, authorize, JWT_SECRET };
+module.exports = { authenticate, authorize, JWT_SECRET, ROLE_TYPES };

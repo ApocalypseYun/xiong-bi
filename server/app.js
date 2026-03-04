@@ -40,6 +40,13 @@ app.use((req, res) => {
   res.status(404).json({ success: false, message: '接口不存在' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Export app for testing
+module.exports = app;
+
+// Start server only if not in test mode
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
