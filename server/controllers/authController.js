@@ -7,11 +7,11 @@ const { JWT_SECRET } = require('../middleware/auth');
 // 用户注册
 const register = async (req, res) => {
   try {
-    const { username, password, confirmPassword, role, realName, phone, roomNumber, building } = req.body;
+    const { username, password, confirmPassword, role, realName, phone, roomNumber, building, email } = req.body;
 
     // 输入验证
-    if (!username || !password || !confirmPassword) {
-      return error(res, '用户名、密码和确认密码不能为空', 400);
+    if (!username || !password || !confirmPassword || !realName || !phone || !building || !roomNumber) {
+      return error(res, '所有必填字段不能为空', 400);
     }
 
     if (password !== confirmPassword) {
@@ -22,34 +22,59 @@ const register = async (req, res) => {
       return error(res, '密码长度不能少于6位', 400);
     }
 
-    // 验证角色
-    const validRoles = ['student', 'admin'];
-    const userRole = role || 'student';
-    if (!validRoles.includes(userRole)) {
-      return error(res, '无效的用户角色', 400);
+    // 验证 residents 表：检查学号是否存在并验证5字段匹配
+    const [residents] = await pool.execute(
+      'SELECT student_id, name, phone, building, room_number FROM residents WHERE student_id = ?',
+      [username]
+    );
+
+    if (residents.length === 0) {
+      return error(res, '验证信息不匹配', 400, { mismatchedFields: ['student_id'] });
     }
 
-    // 检查用户名是否已存在
+    const resident = residents[0];
+    const mismatchedFields = [];
+
+    // 验证所有5个字段
+    if (resident.name !== realName) {
+      mismatchedFields.push('realName');
+    }
+    if (resident.phone !== phone) {
+      mismatchedFields.push('phone');
+    }
+    if (resident.building !== building) {
+      mismatchedFields.push('building');
+    }
+    if (resident.room_number !== roomNumber) {
+      mismatchedFields.push('roomNumber');
+    }
+
+    // 如果有字段不匹配，返回错误
+    if (mismatchedFields.length > 0) {
+      return error(res, '验证信息不匹配', 400, { mismatchedFields });
+    }
+
+    // 检查用户名是否已注册
     const [existingUsers] = await pool.execute(
       'SELECT userId FROM users WHERE username = ?',
       [username]
     );
 
     if (existingUsers.length > 0) {
-      return error(res, '用户名已存在', 400);
+      return error(res, '该学号已注册', 409);
     }
 
     // 加密密码
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 插入用户
+    // 插入用户（强制 role 为 student）
     const [result] = await pool.execute(
-      `INSERT INTO users (username, password, role, realName, phone, roomNumber, building) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [username, hashedPassword, userRole, realName || null, phone || null, roomNumber || null, building || null]
+      `INSERT INTO users (username, password, role, realName, phone, roomNumber, building, email) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [username, hashedPassword, 'student', realName, phone, roomNumber, building, email || null]
     );
 
-    return success(res, { userId: result.insertId, username, role: userRole }, '注册成功');
+    return success(res, { userId: result.insertId, username, role: 'student' }, '注册成功');
   } catch (err) {
     console.error('注册错误:', err);
     return error(res, '注册失败，请稍后重试', 500);
