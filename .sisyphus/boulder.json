@@ -2,8 +2,15 @@
   "active_plan": "/Users/liuguanzhong/Code/xiong-bi/.sisyphus/plans/dorm-repair-enhancement.md",
   "started_at": "2026-03-04T00:53:27.649Z",
   "session_ids": [
+    "ses_349cb89c9ffeKtOCzmbXWo9sLr",
+    "ses_34901bc90ffeX29TZsNRulvnDJ"
+  ],
     "ses_349cb89c9ffeKtOCzmbXWo9sLr"
   ],
   "plan_name": "dorm-repair-enhancement",
+  "agent": "atlas",
+  "progress": "18/186 tasks completed (backend complete)",
+  "status": "Wave 5 verification complete, Wave 4 pending"
+}
   "agent": "atlas"
 }
