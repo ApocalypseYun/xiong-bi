@@ -111,14 +111,14 @@ const login = async (req, res) => {
   }
 };
 
-// 重置密码
+// 重置密码（简化版邮箱验证 - 四字段匹配）
 const resetPassword = async (req, res) => {
   try {
-    const { username, newPassword, confirmPassword } = req.body;
+    const { username, email, realName, phone, newPassword, confirmPassword } = req.body;
 
     // 输入验证
-    if (!username || !newPassword || !confirmPassword) {
-      return error(res, '用户名、新密码和确认密码不能为空', 400);
+    if (!username || !email || !realName || !phone || !newPassword || !confirmPassword) {
+      return error(res, '所有字段不能为空', 400);
     }
 
     if (newPassword !== confirmPassword) {
@@ -129,14 +129,14 @@ const resetPassword = async (req, res) => {
       return error(res, '密码长度不能少于6位', 400);
     }
 
-    // 检查用户是否存在
+    // 验证四字段匹配：username + email + realName + phone
     const [users] = await pool.execute(
-      'SELECT userId FROM users WHERE username = ?',
-      [username]
+      'SELECT userId FROM users WHERE username = ? AND email = ? AND realName = ? AND phone = ?',
+      [username, email, realName, phone]
     );
 
     if (users.length === 0) {
-      return error(res, '用户不存在', 404);
+      return error(res, '验证信息不匹配，无法重置密码', 401);
     }
 
     // 加密新密码
@@ -144,8 +144,8 @@ const resetPassword = async (req, res) => {
 
     // 更新密码
     await pool.execute(
-      'UPDATE users SET password = ? WHERE username = ?',
-      [hashedPassword, username]
+      'UPDATE users SET password = ? WHERE userId = ?',
+      [hashedPassword, users[0].userId]
     );
 
     return success(res, null, '密码重置成功');
@@ -154,6 +154,7 @@ const resetPassword = async (req, res) => {
     return error(res, '密码重置失败，请稍后重试', 500);
   }
 };
+
 
 module.exports = {
   register,

@@ -101,3 +101,26 @@ server/
 - ✅ 覆盖率报告生成
 - ✅ Jest配置文件正确
 - ✅ 测试数据库setup/teardown钩子存在
+
+## 2026-03-04 - Task: Reset Password Endpoint
+
+### 实现总结
+扩展 `server/controllers/authController.js` 的 `resetPassword` 函数，支持四字段验证：
+- **验证字段**: username + email + realName + phone
+- **成功返回**: 200 + "密码重置成功"
+- **验证失败**: 401 + "验证信息不匹配，无法重置密码"
+
+### 技术要点
+1. 四字段同时匹配才允许重置（简化版邮箱验证）
+2. 密码使用 bcrypt 加密（10 rounds）
+3. 响应格式使用 `code` 字段，非 `success`
+
+### 测试覆盖
+- `server/__tests__/auth/reset-password.test.js`
+- 9 个测试用例全部通过
+- 覆盖：成功、字段不匹配、不存在用户、验证错误
+
+### 注意事项
+- 不发送真实邮件（简化版）
+- 必须 4 个字段全部匹配
+- 密码长度最少 6 位
