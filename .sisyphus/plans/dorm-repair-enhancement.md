@@ -946,11 +946,11 @@ Max Concurrent: 5 (Wave 1)
   - npm包: xlsx, multer, exceljs
 
   **Acceptance Criteria**:
-  - [ ] POST接口接收multipart/form-data
-  - [ ] 文件大小和行数限制生效
-  - [ ] 批量导入成功返回{success: X, failed: Y, errors: [...]}
-  - [ ] 重复student_id跳过并记录
-  - [ ] 测试覆盖：成功导入、文件过大、重复数据
+  - [x] POST接口接收multipart/form-data
+  - [x] 文件大小和行数限制生效
+  - [x] 批量导入成功返回{success: X, failed: Y, errors: [...]}
+  - [x] 重复student_id跳过并记录
+  - [x] 测试覆盖：成功导入、文件过大、重复数据
 
   **QA Scenarios**:
   ```
@@ -1220,11 +1220,11 @@ Max Concurrent: 5 (Wave 1)
   - Draft文档: "双向评价（先住户后维修工，7天窗口）"
 
   **Acceptance Criteria**:
-  - [ ] 住户评价接口验证订单已完成
-  - [ ] 维修工评价接口验证住户已评价
-  - [ ] 维修工评价验证7天窗口（超期返回400）
-  - [ ] 维修工评价成功写入repairman_rating等3个字段
-  - [ ] 测试覆盖：住户评价、维修工评价、顺序错误、7天超期
+  - [x] 住户评价接口验证订单已完成
+  - [x] 维修工评价接口验证住户已评价
+  - [x] 维修工评价验证7天窗口（超期返回400）
+  - [x] 维修工评价成功写入repairman_rating等3个字段
+  - [x] 测试覆盖：住户评价、维修工评价、顺序错误、7天超期
 
   **QA Scenarios**:
   ```
