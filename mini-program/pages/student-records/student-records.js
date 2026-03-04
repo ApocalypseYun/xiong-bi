@@ -3,7 +3,8 @@ const API_BASE = 'http://localhost:3000';
 const statusMap = {
   'pending': { text: '待处理', color: '#f5a623', bgColor: '#fff7e6' },
   'processing': { text: '处理中', color: '#4a90d9', bgColor: '#e6f2ff' },
-  'completed': { text: '已完成', color: '#7ed321', bgColor: '#e8f5e0' }
+  'completed': { text: '已完成', color: '#7ed321', bgColor: '#e8f5e0' },
+  'withdrawn': { text: '已撤回', color: '#9b9b9b', bgColor: '#f5f5f5' }
 };
 
 Page({
@@ -166,11 +167,68 @@ Page({
   },
 
 
-  onPreviewImage(e) {
-    const { url, urls } = e.currentTarget.dataset;
-    wx.previewImage({
-      current: url,
-      urls: urls || [url]
+  },
+
+  // Task 18: 催单功能（6小时后可点击）
+  async onUrgeOrder() {
+    const { currentOrder } = this.data;
+    if (!currentOrder) return;
+
+    try {
+      const res = await post(`/orders/${currentOrder.orderId}/urge`);
+      if (res.code === 200) {
+        wx.showToast({ title: '催单成功', icon: 'success' });
+        this.onCloseDetail();
+        this.setData({ orders: [], page: 1, hasMore: true });
+        this.fetchOrders();
+      } else {
+        wx.showToast({ title: res.message || '催单失败', icon: 'none' });
+      }
+    } catch (err) {
+      wx.showToast({ title: '催单失败', icon: 'none' });
+    }
+  },
+
+  // Task 18: 撤单功能（仅pending可撤）
+  onWithdrawOrder() {
+    const { currentOrder } = this.data;
+    if (!currentOrder) return;
+
+    wx.showModal({
+      title: '确认撤单',
+      content: '确定要撤回这个订单吗？',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            const result = await post(`/orders/${currentOrder.orderId}/withdraw`);
+            if (result.code === 200) {
+              wx.showToast({ title: '撤单成功', icon: 'success' });
+              this.onCloseDetail();
+              this.setData({ orders: [], page: 1, hasMore: true });
+              this.fetchOrders();
+            } else {
+              wx.showToast({ title: result.message || '撤单失败', icon: 'none' });
+            }
+          } catch (err) {
+            wx.showToast({ title: '撤单失败', icon: 'none' });
+          }
+        }
+      }
     });
+  },
+
+  // 检查是否可以催单（6小时后）
+  canUrge(order) {
+    if (!order || order.status !== 'pending') return false;
+    if (order.isUrge) return false; // 已催过
+    const createdAt = new Date(order.createdAt).getTime();
+    const now = Date.now();
+    const hours = (now - createdAt) / (1000 * 60 * 60);
+    return hours >= 6;
+  },
+
+  // 检查是否可以撤单
+  icanWithdraw(order) {
+    return order && order.status === 'pending';
   }
 });

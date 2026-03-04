@@ -1,0 +1,257 @@
+.resident-container {
+  min-height: 100vh;
+  background: #f5f7fa;
+  padding: 20rpx;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  background: white;
+  border-radius: 16rpx;
+  margin-bottom: 20rpx;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12rpx;
+}
+
+.import-btn, .add-btn {
+  font-size: 28rpx;
+  padding: 12rpx 24rpx;
+  border-radius: 8rpx;
+  border: none;
+}
+
+.import-btn {
+  background: #48bb78;
+  color: white;
+}
+
+.add-btn {
+  background: #667eea;
+  color: white;
+}
+
+.search-section {
+  margin-bottom: 20rpx;
+}
+
+.search-input {
+  background: white;
+  padding: 20rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+}
+
+.resident-list {
+  margin-top: 20rpx;
+}
+
+.resident-card {
+  background: white;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.resident-info {
+  margin-bottom: 16rpx;
+}
+
+.resident-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.resident-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.resident-id {
+  font-size: 26rpx;
+  color: #667eea;
+  background: #ebf4ff;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+}
+
+.resident-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.detail-item {
+  font-size: 26rpx;
+  color: #718096;
+}
+
+.resident-actions {
+  display: flex;
+  gap: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #e2e8f0;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 12rpx;
+  font-size: 26rpx;
+  border-radius: 8rpx;
+  border: none;
+}
+
+.edit-btn {
+  background: #4299e1;
+  color: white;
+}
+
+.delete-btn {
+  background: #fc8181;
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80rpx 0;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #a0aec0;
+  margin-bottom: 30rpx;
+  display: block;
+}
+
+/* 表单弹窗 */
+.form-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.form-container {
+  width: 90%;
+  max-height: 80vh;
+  background: white;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
+  border-bottom: 1rpx solid #e2e8f0;
+}
+
+.form-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.close-btn {
+  font-size: 48rpx;
+  color: #a0aec0;
+  line-height: 1;
+}
+
+.form-body {
+  padding: 24rpx;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.form-group {
+  margin-bottom: 24rpx;
+}
+
+.form-group.half {
+  flex: 1;
+}
+
+.form-row {
+  display: flex;
+  gap: 20rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: #4a5568;
+  margin-bottom: 12rpx;
+}
+
+.required {
+  color: #fc8181;
+}
+
+.form-input {
+  width: 100%;
+  padding: 20rpx;
+  background: #f7fafc;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  border: 2rpx solid transparent;
+  box-sizing: border-box;
+}
+
+.form-input.error {
+  border-color: #fc8181;
+  background: #fff5f5;
+}
+
+.error-text {
+  font-size: 24rpx;
+  color: #fc8181;
+  margin-top: 8rpx;
+  display: block;
+}
+
+.form-footer {
+  display: flex;
+  gap: 20rpx;
+  padding: 24rpx;
+  border-top: 1rpx solid #e2e8f0;
+}
+
+.cancel-btn, .submit-btn {
+  flex: 1;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+.cancel-btn {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.submit-btn {
+  background: #667eea;
+  color: white;
+}

@@ -1,0 +1,69 @@
+<view class="repairman-container">
+  <!-- 头部 -->
+  <view class="header">
+    <text class="header-title">维修工管理</text>
+    <button class="add-btn" bindtap="showAddForm">+ 添加维修工</button>
+  </view>
+
+  <!-- 维修工列表 -->
+  <view class="repairman-list" wx:if="{{!showForm && repairmen.length > 0}}">
+    <view class="repairman-card" wx:for="{{repairmen}}" wx:key="id">
+      <view class="repairman-info">
+        <text class="repairman-name">{{item.realName}}</text>
+        <text class="repairman-phone">📞 {{item.phone}}</text>
+        <text class="repairman-username">账号: {{item.username}}</text>
+      </view>
+      <view class="repairman-actions">
+        <button class="action-btn edit-btn" data-id="{{item.id}}" bindtap="editRepairman">编辑</button>
+        <button class="action-btn delete-btn" data-id="{{item.id}}" data-name="{{item.realName}}" bindtap="deleteRepairman">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!showForm && repairmen.length === 0}}">
+    <text class="empty-text">暂无维修工</text>
+    <button class="add-btn" bindtap="showAddForm">添加第一个维修工</button>
+  </view>
+
+  <!-- 表单弹窗 -->
+  <view class="form-modal" wx:if="{{showForm}}">
+    <view class="form-container">
+      <view class="form-header">
+        <text class="form-title">{{editingId ? '编辑维修工' : '添加维修工'}}</text>
+        <text class="close-btn" bindtap="hideForm">×</text>
+      </view>
+
+      <view class="form-body">
+        <view class="form-group">
+          <text class="form-label">用户名<text class="required">*</text></text>
+          <input class="form-input {{errors.username ? 'error' : ''}}" placeholder="请输入用户名" value="{{formData.username}}" data-field="username" bindinput="onInput" />
+          <text class="error-text" wx:if="{{errors.username}}">{{errors.username}}</text>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">密码{{editingId ? '' : '<text class="required">*</text>'}}</text>
+          <input class="form-input {{errors.password ? 'error' : ''}}" type="password" placeholder="{{editingId ? '不修改请留空' : '请输入密码'}}" value="{{formData.password}}" data-field="password" bindinput="onInput" />
+          <text class="error-text" wx:if="{{errors.password}}">{{errors.password}}</text>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">真实姓名<text class="required">*</text></text>
+          <input class="form-input {{errors.realName ? 'error' : ''}}" placeholder="请输入真实姓名" value="{{formData.realName}}" data-field="realName" bindinput="onInput" />
+          <text class="error-text" wx:if="{{errors.realName}}">{{errors.realName}}</text>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">电话号码<text class="required">*</text></text>
+          <input class="form-input {{errors.phone ? 'error' : ''}}" type="number" placeholder="请输入11位手机号" value="{{formData.phone}}" data-field="phone" bindinput="onInput" />
+          <text class="error-text" wx:if="{{errors.phone}}">{{errors.phone}}</text>
+        </view>
+      </view>
+
+      <view class="form-footer">
+        <button class="cancel-btn" bindtap="hideForm">取消</button>
+        <button class="submit-btn" bindtap="submitForm" loading="{{loading}}">{{editingId ? '修改' : '添加'}}</button>
+      </view>
+    </view>
+  </view>
+</view>

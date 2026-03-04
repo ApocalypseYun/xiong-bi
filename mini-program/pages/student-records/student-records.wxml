@@ -105,9 +105,8 @@
 
         <view class="detail-row">
           <text class="detail-label">订单状态</text>
-          <view class="detail-badge" style="background-color: {{currentOrder.statusInfo.bgColor}}; color: {{currentOrder.statusInfo.color}};">
-            {{currentOrder.statusInfo.text}}
           </view>
+          <text class="urge-badge" wx:if="{{currentOrder.isUrge}}">催单中</text>
         </view>
 
         <view class="detail-row">
@@ -180,8 +179,20 @@
     <view class="modal-footer" wx:if="{{currentOrder && currentOrder.status === 'completed' && !currentOrder.evaluation}}">
       <button class="eval-btn" bindtap="onGoToEvaluation">去评价</button>
     </view>
-    <view class="modal-footer evaluated" wx:if="{{currentOrder && currentOrder.status === 'completed' && currentOrder.evaluation}}">
       <text class="evaluated-text">已完成评价</text>
     </view>
+    
+    <!-- Task 18: 催单按钮（6小时后可点击）-->
+    <view class="modal-footer" wx:if="{{currentOrder && currentOrder.status === 'pending' && !currentOrder.isUrge}}">
+      <button class="urge-btn" bindtap="onUrgeOrder">催单</button>
+      <button class="withdraw-btn" bindtap="onWithdrawOrder">撤单</button>
+    </view>
+    
+    <!-- 已催单状态 -->
+    <view class="modal-footer" wx:if="{{currentOrder && currentOrder.status === 'pending' && currentOrder.isUrge}}">
+      <text class="urged-text">已催单，请等待处理</text>
+      <button class="withdraw-btn" bindtap="onWithdrawOrder">撤单</button>
+    </view>
+  </view>
   </view>
 </view>

@@ -1,0 +1,89 @@
+<view class="resident-container">
+  <!-- 头部 -->
+  <view class="header">
+    <text class="header-title">住户管理</text>
+    <view class="header-actions">
+      <button class="import-btn" bindtap="importExcel" loading="{{uploading}}">📥 导入Excel</button>
+      <button class="add-btn" bindtap="showAddForm">+ 添加住户</button>
+    </view>
+  </view>
+
+  <!-- 搜索框 -->
+  <view class="search-section">
+    <input class="search-input" placeholder="搜索学号..." value="{{searchKey}}" bindinput="onSearch" />
+  </view>
+
+  <!-- 住户列表 -->
+  <view class="resident-list" wx:if="{{!showForm && residents.length > 0}}">
+    <view class="resident-card" wx:for="{{residents}}" wx:key="id">
+      <view class="resident-info">
+        <view class="resident-header">
+          <text class="resident-name">{{item.name}}</text>
+          <text class="resident-id">{{item.studentId}}</text>
+        </view>
+        <view class="resident-details">
+          <text class="detail-item">📞 {{item.phone}}</text>
+          <text class="detail-item">🏢 {{item.building}} {{item.roomNumber}}</text>
+        </view>
+      </view>
+      <view class="resident-actions">
+        <button class="action-btn edit-btn" data-id="{{item.id}}" bindtap="editResident">编辑</button>
+        <button class="action-btn delete-btn" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="deleteResident">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!showForm && residents.length === 0}}">
+    <text class="empty-text">{{searchKey ? '未找到匹配的住户' : '暂无住户数据'}}</text>
+    <button class="import-btn" bindtap="importExcel" wx:if="{{!searchKey}}">📥 导入Excel</button>
+  </view>
+
+  <!-- 表单弹窗 -->
+  <view class="form-modal" wx:if="{{showForm}}">
+    <view class="form-container">
+      <view class="form-header">
+        <text class="form-title">{{editingId ? '编辑住户' : '添加住户'}}</text>
+        <text class="close-btn" bindtap="hideForm">×</text>
+      </view>
+
+      <view class="form-body">
+        <view class="form-group">
+          <text class="form-label">学号<text class="required">*</text></text>
+          <input class="form-input {{errors.studentId ? 'error' : ''}}" placeholder="请输入学号" value="{{formData.studentId}}" data-field="studentId" bindinput="onInput" />
+          <text class="error-text" wx:if="{{errors.studentId}}">{{errors.studentId}}</text>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">姓名<text class="required">*</text></text>
+          <input class="form-input {{errors.name ? 'error' : ''}}" placeholder="请输入姓名" value="{{formData.name}}" data-field="name" bindinput="onInput" />
+          <text class="error-text" wx:if="{{errors.name}}">{{errors.name}}</text>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">电话<text class="required">*</text></text>
+          <input class="form-input {{errors.phone ? 'error' : ''}}" type="number" placeholder="请输入11位手机号" value="{{formData.phone}}" data-field="phone" bindinput="onInput" />
+          <text class="error-text" wx:if="{{errors.phone}}">{{errors.phone}}</text>
+        </view>
+
+        <view class="form-row">
+          <view class="form-group half">
+            <text class="form-label">楼栋<text class="required">*</text></text>
+            <input class="form-input {{errors.building ? 'error' : ''}}" placeholder="例：1栋" value="{{formData.building}}" data-field="building" bindinput="onInput" />
+            <text class="error-text" wx:if="{{errors.building}}">{{errors.building}}</text>
+          </view>
+          <view class="form-group half">
+            <text class="form-label">寝室号<text class="required">*</text></text>
+            <input class="form-input {{errors.roomNumber ? 'error' : ''}}" placeholder="例：101" value="{{formData.roomNumber}}" data-field="roomNumber" bindinput="onInput" />
+            <text class="error-text" wx:if="{{errors.roomNumber}}">{{errors.roomNumber}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="form-footer">
+        <button class="cancel-btn" bindtap="hideForm">取消</button>
+        <button class="submit-btn" bindtap="submitForm" loading="{{loading}}">{{editingId ? '修改' : '添加'}}</button>
+      </view>
+    </view>
+  </view>
+</view>

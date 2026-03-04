@@ -439,3 +439,44 @@
   color: #7ed321;
   font-weight: 600;
 }
+
+/* Task 18: 催单和撤单按钮样式 */
+.urge-badge {
+  font-size: 22rpx;
+  color: #f5a623;
+  background: #fff7e6;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+  margin-left: 12rpx;
+}
+
+.urge-btn {
+  flex: 1;
+  height: 90rpx;
+  background: linear-gradient(135deg, #f5a623 0%, #f7931a 100%);
+  color: white;
+  font-size: 32rpx;
+  font-weight: 600;
+  border-radius: 45rpx;
+  border: none;
+  margin-right: 16rpx;
+}
+
+.withdraw-btn {
+  flex: 1;
+  height: 90rpx;
+  background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+  color: white;
+  font-size: 32rpx;
+  font-weight: 600;
+  border-radius: 45rpx;
+  border: none;
+}
+
+.urged-text {
+  font-size: 28rpx;
+  color: #f5a623;
+  font-weight: 600;
+  flex: 1;
+  text-align: center;
+}

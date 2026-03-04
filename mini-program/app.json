@@ -11,8 +11,9 @@
     "pages/admin/admin",
     "pages/admin-pending/admin-pending",
     "pages/admin-completed/admin-completed",
-    "pages/admin-announcements/admin-announcements",
-    "pages/admin-evaluations/admin-evaluations"
+    "pages/admin-evaluations/admin-evaluations",
+    "pages/admin-repairman/admin-repairman",
+    "pages/admin-resident/admin-resident"
   ],
   "window": {
     "backgroundTextStyle": "light",
