@@ -40,6 +40,17 @@
 | 手机号格式 | `/^1[3-9]\d{9}$/` | ✅ |
 | 错误处理 | - | ✅ try-catch + toast |
 
+---
+
+## 2026-03-05: 代码修复
+
+### 已修复的问题
+1. register.js - 添加了 validateBuilding() 函数（第 103-110 行）
+2. student-records.js - 添加了 post 导入（第 1 行）
+
+### 修复后验证结果
+- ✅ register.js: 宿舍楼验证函数正确实现
+- ✅ student-records.js: post 请求正常工作
 ### ⚠️ 小问题
 - 编辑时密码字段留空不提交（正确设计）
 
