@@ -48,13 +48,11 @@ Page({
   validateUsername() {
     const { username } = this.data;
     if (!username.trim()) {
-      return '请输入用户名';
-    }
+    return '请输入学号';
     if (username.trim().length < 3) {
-      return '用户名至少3个字符';
-    }
-    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-      return '用户名只能包含字母、数字和下划线';
+      return '学号至少3个字符';
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      return '学号只能包含字母、数字、下划线和连字符';
     }
     return '';
   },
@@ -102,14 +100,16 @@ Page({
     return '';
   },
 
-  validateBuilding() {
-    const { building, role } = this.data;
+  validateRealName() {
+    const { realName, role } = this.data;
     if (role === 'admin') return '';
-    if (!building.trim()) {
-      return '请输入宿舍楼栋';
+    if (!realName || !realName.trim()) {
+      return '请输入真实姓名';
     }
     return '';
   },
+
+  validateForm() {
 
   validateForm() {
     const errors = {};
@@ -132,8 +132,10 @@ Page({
     const buildingError = this.validateBuilding();
     if (buildingError) errors.building = buildingError;
     
+    const realNameError = this.validateRealName();
+    if (realNameError) errors.realName = realNameError;
+    
     this.setData({ errors });
-    return Object.keys(errors).length === 0;
   },
 
   async handleRegister() {
@@ -182,10 +184,31 @@ Page({
           wx.navigateBack();
         }, 1500);
       } else {
-        wx.showToast({
-          title: res.message || '注册失败',
-          icon: 'none'
-        });
+        // 处理后端返回的验证失败
+        if (res.mismatchedFields && res.mismatchedFields.length > 0) {
+          const fieldMap = {
+            'username': '学号不匹配',
+            'realName': '姓名不匹配',
+            'phone': '电话不匹配',
+            'building': '楼栋不匹配',
+            'roomNumber': '寝室号不匹配'
+          };
+          const errors = {};
+          res.mismatchedFields.forEach(field => {
+            errors[field] = fieldMap[field] || `${field}不匹配`;
+          });
+          this.setData({ errors });
+          wx.showToast({
+            title: '住户信息验证失败',
+            icon: 'none',
+            duration: 2000
+          });
+        } else {
+          wx.showToast({
+            title: res.message || '注册失败',
+            icon: 'none'
+          });
+        }
       }
     } catch (err) {
       wx.showToast({
@@ -197,7 +220,9 @@ Page({
     }
   },
 
-  goBack() {
-    wx.navigateBack();
+  },
+
+  goToForgotPassword() {
+    wx.navigateTo({ url: '/pages/forgot-password/forgot-password' });
   }
 });

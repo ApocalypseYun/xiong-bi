@@ -21,12 +21,12 @@
 
     <view class="form-section">
       <view class="input-group">
-        <text class="input-label">用户名<text class="required">*</text></text>
+        <text class="input-label">学号<text class="required">*</text></text>
         <view class="input-wrapper {{errors.username ? 'error' : ''}}">
-          <text class="input-icon">👤</text>
-          <input 
-            class="input-field" 
-            placeholder="3-20位字母数字下划线" 
+          <text class="input-icon">🎓</text>
+          <input
+            class="input-field"
+            placeholder="请输入学号（需与住户表匹配）"
             value="{{username}}"
             data-field="username"
             bindinput="onInput"
@@ -75,17 +75,18 @@
 
       <block wx:if="{{role === 'student'}}">
         <view class="input-group">
-          <text class="input-label">真实姓名</text>
-          <view class="input-wrapper">
+          <text class="input-label">真实姓名<text class="required">*</text></text>
+          <view class="input-wrapper {{errors.realName ? 'error' : ''}}">
             <text class="input-icon">✏️</text>
-            <input 
-              class="input-field" 
-              placeholder="请输入真实姓名" 
+            <input
+              class="input-field"
+              placeholder="请输入真实姓名（需与住户表匹配）"
               value="{{realName}}"
               data-field="realName"
               bindinput="onInput"
             />
           </view>
+          <text class="error-tip" wx:if="{{errors.realName}}">{{errors.realName}}</text>
         </view>
 
         <view class="input-group">
@@ -139,9 +140,11 @@
       </block>
     </view>
 
+    <view class="forgot-password-section">
+      <text class="forgot-link" bindtap="goToForgotPassword">忘记密码？</text>
+    </view>
+
     <button class="register-btn" bindtap="handleRegister" disabled="{{isLoading}}">
-      {{isLoading ? '注册中...' : '立即注册'}}
-    </button>
 
     <view class="bottom-tip">
       <text class="tip-text">已有账号？<text class="tip-link" bindtap="goBack">立即登录</text></text>
