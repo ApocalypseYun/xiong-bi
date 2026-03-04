@@ -2074,13 +2074,12 @@ curl -X GET http://localhost:3000/api/admin/orders?isUrge=true -H "Authorization
   - [ ] 维修工专用页面可用
 
 - [ ] **业务逻辑**
-  - [ ] 三角色系统完整运行
-  - [ ] 注册验证5字段匹配
-  - [ ] 催单6小时限制生效
-  - [ ] 撤单仅pending状态
-  - [ ] 双向评价顺序正确
-  - [ ] 7天评价窗口生效
-
+  - [x] 三角色系统完整运行
+  - [x] 注册验证5字段匹配
+  - [x] 催单6小时限制生效
+  - [x] 撤单仅pending状态
+  - [x] 双向评价顺序正确
+  - [x] 7天评价窗口生效
 - [ ] **代码质量**
   - [x] `npm test`全部通过
   - [x] 无console.log/any type
