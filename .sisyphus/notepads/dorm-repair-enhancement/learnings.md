@@ -278,3 +278,62 @@ Duplicate Error (409):
 - **路由**: `server/routes/orders.js` (第 13 行)
 - **测试**: `server/__tests__/order/repairman-evaluate.test.js` (12 个测试用例)
 
+
+
+---
+
+## 2026-03-05: 测试覆盖率从 59% 提升到 84%
+
+### 问题背景
+初始测试覆盖率仅 59%，远低于 80% 目标。主要问题：
+1. 测试数据库配置不一致（部分测试连接生产数据库）
+2. 多个 controller 缺少测试（userController 12.5%, announcementController 12.72%, evaluationController 15.38%）
+3. 测试并行运行时数据库连接冲突
+
+### 解决方案
+
+#### 1. 统一测试数据库配置
+- 所有测试文件使用 `global.__TEST_DB__` 或 `process.env.DB_TEST_NAME`
+- 在测试文件开头设置 `process.env.DB_NAME = process.env.DB_TEST_NAME || 'dormitory_repair_test'`
+- 确保数据库迁移在测试数据库上执行
+
+#### 2. 按优先级添加测试（从低覆盖率开始）
+| 模块 | 之前 | 之后 |
+|------|------|------|
+| userController.js | 12.5% | 90% |
+| announcementController.js | 12.72% | 85.45% |
+| evaluationController.js | 15.38% | 84.61% |
+| adminController.js | 36.36% | 88.31% |
+| orderController.js | 55.38% | 89.23% |
+
+#### 3. 测试模式
+```javascript
+// 标准测试结构
+const request = require('supertest');
+const app = require('../../app');
+let pool; // 使用全局测试数据库
+
+beforeAll(async () => {
+  pool = global.__TEST_DB__;
+  process.env.DB_NAME = process.env.DB_TEST_NAME || 'dormitory_repair_test';
+  // 创建测试数据...
+});
+
+afterAll(async () => {
+  // 清理测试数据（pool 由 setup.js 管理，无需手动关闭）
+});
+```
+
+### 关键经验
+1. **测试隔离**: 每个测试文件独立创建和清理数据
+2. **串行运行**: `--runInBand` 避免并行测试冲突
+3. **认证测试模式**: 创建测试用户 → 生成 JWT token → 测试各端点
+4. **未覆盖代码**: 主要是 console.error 错误日志（非核心业务逻辑）
+
+### 最终结果
+- 语句覆盖率: 84.01% ✅
+- 分支覆盖率: 81.79% ✅
+- 函数覆盖率: 84.48% ✅
+- 行覆盖率: 84.06% ✅
+- 测试通过: 254/257 (98.8%)
+- 测试套件: 19/20 通过
