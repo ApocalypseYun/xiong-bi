@@ -13,7 +13,8 @@
     "pages/admin-completed/admin-completed",
     "pages/admin-evaluations/admin-evaluations",
     "pages/admin-repairman/admin-repairman",
-    "pages/admin-resident/admin-resident"
+    "pages/admin-resident/admin-resident",
+    "pages/repairman/repairman"
   ],
   "window": {
     "backgroundTextStyle": "light",

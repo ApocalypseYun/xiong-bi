@@ -1,0 +1,101 @@
+<view class="repairman-container">
+  <!-- 标签页 -->
+  <view class="tab-bar">
+    <view class="tab-item {{currentTab === 'pending' ? 'active' : ''}}" data-tab="pending" bindtap="onTabChange">
+      <text class="tab-text">待接单</text>
+      <view class="tab-badge" wx:if="{{pendingOrders.length > 0}}">{{pendingOrders.length}}</view>
+    </view>
+    <view class="tab-item {{currentTab === 'processing' ? 'active' : ''}}" data-tab="processing" bindtap="onTabChange">
+      <text class="tab-text">处理中</text>
+      <view class="tab-badge" wx:if="{{myOrders.length > 0}}">{{myOrders.length}}</view>
+    </view>
+    <view class="tab-item {{currentTab === 'completed' ? 'active' : ''}}" data-tab="completed" bindtap="onTabChange">
+      <text class="tab-text">已完成</text>
+    </view>
+  </view>
+
+  <!-- 待接单列表 -->
+  <scroll-view class="order-list" scroll-y="true" wx:if="{{currentTab === 'pending'}}">
+    <view class="order-card" wx:for="{{pendingOrders}}" wx:key="orderId">
+      <view class="order-header">
+        <text class="order-type">{{item.repairType}}</text>
+        <text class="order-time">{{item.createdAtFormatted}}</text>
+      </view>
+      <view class="order-body">
+        <view class="info-row">
+          <text class="info-icon">📍</text>
+          <text class="info-text">{{item.building}} {{item.roomNumber}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-icon">📞</text>
+          <text class="info-text">{{item.contactPhone}}</text>
+        </view>
+        <view class="description" wx:if="{{item.description}}">
+          <text class="desc-text">{{item.description}}</text>
+        </view>
+      </view>
+      <view class="order-footer">
+        <button class="accept-btn" data-id="{{item.orderId}}" bindtap="acceptOrder">接单</button>
+      </view>
+    </view>
+    <view class="empty-state" wx:if="{{pendingOrders.length === 0 && !loading}}">
+      <text class="empty-text">暂无待接单订单</text>
+    </view>
+  </scroll-view>
+
+  <!-- 处理中列表 -->
+  <scroll-view class="order-list" scroll-y="true" wx:if="{{currentTab === 'processing'}}">
+    <view class="order-card" wx:for="{{myOrders}}" wx:key="orderId">
+      <view class="order-header">
+        <text class="order-type">{{item.repairType}}</text>
+        <text class="order-time">{{item.createdAtFormatted}}</text>
+      </view>
+      <view class="order-body">
+        <view class="info-row">
+          <text class="info-icon">📍</text>
+          <text class="info-text">{{item.building}} {{item.roomNumber}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-icon">📞</text>
+          <text class="info-text">{{item.contactPhone}}</text>
+        </view>
+        <view class="description" wx:if="{{item.description}}">
+          <text class="desc-text">{{item.description}}</text>
+        </view>
+      </view>
+      <view class="order-footer">
+        <button class="complete-btn" data-id="{{item.orderId}}" bindtap="completeOrder">完成并上传图片</button>
+      </view>
+    </view>
+    <view class="empty-state" wx:if="{{myOrders.length === 0 && !loading}}">
+      <text class="empty-text">暂无处理中订单</text>
+    </view>
+  </scroll-view>
+
+  <!-- 已完成列表 -->
+  <scroll-view class="order-list" scroll-y="true" wx:if="{{currentTab === 'completed'}}">
+    <view class="order-card" wx:for="{{completedOrders}}" wx:key="orderId">
+      <view class="order-header">
+        <text class="order-type">{{item.repairType}}</text>
+        <text class="order-time">{{item.createdAtFormatted}}</text>
+      </view>
+      <view class="order-body">
+        <view class="info-row">
+          <text class="info-icon">📍</text>
+          <text class="info-text">{{item.building}} {{item.roomNumber}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.evaluation}}">
+          <text class="info-icon">⭐</text>
+          <text class="info-text">住户评分: {{item.evaluation.rating}}分</text>
+        </view>
+      </view>
+      <view class="order-footer">
+        <button class="evaluate-btn" wx:if="{{item.evaluation && !item.repairmanRating}}" data-id="{{item.orderId}}" bindtap="goToEvaluate">评价住户</button>
+        <text class="evaluated-text" wx:if="{{item.repairmanRating}}">已评价</text>
+      </view>
+    </view>
+    <view class="empty-state" wx:if="{{completedOrders.length === 0 && !loading}}">
+      <text class="empty-text">暂无已完成订单</text>
+    </view>
+  </scroll-view>
+</view>
