@@ -2060,11 +2060,11 @@ curl -X GET http://localhost:3000/api/admin/orders?isUrge=true -H "Authorization
   - [ ] repairOrders表包含催促字段
   - [ ] evaluations表包含维修工评价字段
 
-- [ ] **后端API**
-  - [ ] 15+ API接口功能完整
-  - [ ] 所有接口TDD测试通过
-  - [ ] 权限检查正确（3角色隔离）
-  - [ ] 测试覆盖率 ≥ 80%
+- [x] **后端API**
+  - [x] 15+ API接口功能完整 (33个端点)
+  - [x] 所有接口TDD测试通过
+  - [x] 权限检查正确（3角色隔离）
+  - [x] 测试覆盖率 ≥ 80%
 
 - [ ] **前端UI**
   - [ ] 注册页面验证流程正常
@@ -2087,7 +2087,7 @@ curl -X GET http://localhost:3000/api/admin/orders?isUrge=true -H "Authorization
   - [x] 提交信息清晰
 - [ ] **文档和证据**
   - [x] API文档已更新
-  - [ ] Evidence文件完整（至少80%场景）
+  - [x] Evidence文件完整（至少80%场景）
   - [x] Git提交历史清晰
 ---
 
