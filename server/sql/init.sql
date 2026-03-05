@@ -40,7 +40,8 @@ CREATE TABLE repairOrders (
   FOREIGN KEY (repairmanId) REFERENCES users(userId),
   INDEX idx_userId (userId),
   INDEX idx_status (status),
-  INDEX idx_createdAt (createdAt)
+  INDEX idx_createdAt (createdAt),
+  INDEX idx_repairmanId (repairmanId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 表3: orderImages (订单图片表)
@@ -71,7 +72,7 @@ CREATE TABLE evaluations (
   orderId INT UNIQUE NOT NULL,
   rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
   comment TEXT,
-  repairmanRating INT NULL,
+  repairmanRating INT NULL CHECK (repairmanRating BETWEEN 1 AND 5),
   repairmanComment TEXT NULL,
   repairmanEvaluatedAt DATETIME NULL,
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -103,8 +104,7 @@ CREATE TABLE residents (
   roomNumber   VARCHAR(50) NOT NULL,
   qqEmail      VARCHAR(100) NOT NULL,
   isRegistered BOOLEAN DEFAULT FALSE,
-  createdAt    DATETIME DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_studentId (studentId)
+  createdAt    DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================

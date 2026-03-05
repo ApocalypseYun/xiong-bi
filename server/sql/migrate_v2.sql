@@ -11,11 +11,12 @@ CREATE TABLE IF NOT EXISTS residents (
   roomNumber   VARCHAR(50) NOT NULL,
   qqEmail      VARCHAR(100) NOT NULL,
   isRegistered BOOLEAN DEFAULT FALSE,
-  createdAt    DATETIME DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_studentId (studentId)
+  createdAt    DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 2. users 表 ENUM 增加 repairman
+-- Migrate existing 'admin' role rows to 'super_admin' before changing ENUM
+UPDATE users SET role = 'super_admin' WHERE role = 'admin';
 ALTER TABLE users MODIFY COLUMN role ENUM('student', 'repairman', 'super_admin') DEFAULT 'student';
 
 -- 3. repairOrders 新增字段
@@ -23,10 +24,28 @@ ALTER TABLE repairOrders MODIFY COLUMN status ENUM('pending', 'processing', 'com
 ALTER TABLE repairOrders ADD COLUMN IF NOT EXISTS repairmanId INT NULL;
 ALTER TABLE repairOrders ADD COLUMN IF NOT EXISTS lastUrgedAt DATETIME NULL;
 ALTER TABLE repairOrders ADD COLUMN IF NOT EXISTS urgeCount INT NOT NULL DEFAULT 0;
-ALTER TABLE repairOrders ADD CONSTRAINT fk_repairmanId FOREIGN KEY (repairmanId) REFERENCES users(userId);
+
+-- Add FK conditionally (safe to re-run)
+SET @fk_exists = (
+  SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
+  WHERE CONSTRAINT_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'repairOrders'
+    AND CONSTRAINT_NAME = 'fk_repairmanId'
+    AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+);
+SET @sql = IF(@fk_exists = 0,
+  'ALTER TABLE repairOrders ADD CONSTRAINT fk_repairmanId FOREIGN KEY (repairmanId) REFERENCES users(userId)',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- Index on repairmanId for repairman query performance
+CREATE INDEX IF NOT EXISTS idx_repairmanId ON repairOrders (repairmanId);
 
 -- 4. evaluations 新增双向评价字段
-ALTER TABLE evaluations ADD COLUMN IF NOT EXISTS repairmanRating INT NULL;
+ALTER TABLE evaluations ADD COLUMN IF NOT EXISTS repairmanRating INT NULL CHECK (repairmanRating BETWEEN 1 AND 5);
 ALTER TABLE evaluations ADD COLUMN IF NOT EXISTS repairmanComment TEXT NULL;
 ALTER TABLE evaluations ADD COLUMN IF NOT EXISTS repairmanEvaluatedAt DATETIME NULL;
 
