@@ -52,6 +52,9 @@ const updateResident = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, phone, building, roomNumber, qqEmail } = req.body;
+    if (!name || !phone || !building || !roomNumber || !qqEmail) {
+      return error(res, '姓名、手机号、栋数、寝室号、QQ邮箱均为必填', 400);
+    }
     const [exist] = await pool.execute('SELECT residentId FROM residents WHERE residentId = ?', [id]);
     if (exist.length === 0) return error(res, '住户不存在', 404);
     await pool.execute(
@@ -82,33 +85,41 @@ const deleteResident = async (req, res) => {
 
 // Excel 批量导入
 const importResidents = async (req, res) => {
+  const connection = await pool.getConnection();
   try {
     if (!req.file) return error(res, '请上传 Excel 文件', 400);
     const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(sheet);
+    // 期望列: 学号、姓名、手机号、栋数、寝室号、QQ邮箱
     const required = ['学号', '姓名', '手机号', '栋数', '寝室号', 'QQ邮箱'];
     if (rows.length === 0) return error(res, 'Excel 文件为空', 400);
     const firstRow = rows[0];
     for (const col of required) {
       if (!(col in firstRow)) return error(res, `Excel 缺少列: ${col}`, 400);
     }
+
+    await connection.beginTransaction();
     let inserted = 0, skipped = 0;
     for (const row of rows) {
       const { 学号: studentId, 姓名: name, 手机号: phone, 栋数: building, 寝室号: roomNumber, 'QQ邮箱': qqEmail } = row;
       if (!studentId || !name || !phone || !building || !roomNumber || !qqEmail) { skipped++; continue; }
-      const [exist] = await pool.execute('SELECT residentId FROM residents WHERE studentId = ?', [String(studentId)]);
+      const [exist] = await connection.execute('SELECT residentId FROM residents WHERE studentId = ?', [String(studentId)]);
       if (exist.length > 0) { skipped++; continue; }
-      await pool.execute(
+      await connection.execute(
         'INSERT INTO residents (studentId, name, phone, building, roomNumber, qqEmail) VALUES (?, ?, ?, ?, ?, ?)',
         [String(studentId), String(name), String(phone), String(building), String(roomNumber), String(qqEmail)]
       );
       inserted++;
     }
+    await connection.commit();
     return success(res, { inserted, skipped }, `导入完成：成功 ${inserted} 条，跳过 ${skipped} 条`);
   } catch (err) {
+    await connection.rollback();
     console.error('导入住户错误:', err);
     return error(res, '导入失败', 500);
+  } finally {
+    connection.release();
   }
 };
 
