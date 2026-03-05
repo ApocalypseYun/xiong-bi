@@ -7,49 +7,39 @@ const { JWT_SECRET } = require('../middleware/auth');
 // 用户注册
 const register = async (req, res) => {
   try {
-    const { username, password, confirmPassword, role, realName, phone, roomNumber, building } = req.body;
+    const { username, password, confirmPassword, realName, phone, roomNumber, building, qqEmail } = req.body;
 
-    // 输入验证
-    if (!username || !password || !confirmPassword) {
-      return error(res, '用户名、密码和确认密码不能为空', 400);
+    if (!username || !password || !confirmPassword || !realName || !phone || !roomNumber || !building || !qqEmail) {
+      return error(res, '所有字段均为必填', 400);
     }
+    if (password !== confirmPassword) return error(res, '两次输入的密码不一致', 400);
+    if (password.length < 6) return error(res, '密码长度不能少于6位', 400);
 
-    if (password !== confirmPassword) {
-      return error(res, '两次输入的密码不一致', 400);
-    }
+    const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailReg.test(qqEmail)) return error(res, 'QQ邮箱格式不正确', 400);
 
-    if (password.length < 6) {
-      return error(res, '密码长度不能少于6位', 400);
-    }
-
-    // 验证角色
-    const validRoles = ['student', 'admin'];
-    const userRole = role || 'student';
-    if (!validRoles.includes(userRole)) {
-      return error(res, '无效的用户角色', 400);
-    }
-
-    // 检查用户名是否已存在
-    const [existingUsers] = await pool.execute(
-      'SELECT userId FROM users WHERE username = ?',
-      [username]
+    // 核对住户表（学号即用户名）
+    const [residents] = await pool.execute(
+      'SELECT residentId, isRegistered FROM residents WHERE studentId=? AND name=? AND phone=? AND building=? AND roomNumber=? AND qqEmail=?',
+      [username, realName, phone, building, roomNumber, qqEmail]
     );
+    if (residents.length === 0) return error(res, '个人信息与住户记录不匹配，请核对后重试', 400);
+    if (residents[0].isRegistered) return error(res, '该学号已注册账号', 400);
 
-    if (existingUsers.length > 0) {
-      return error(res, '用户名已存在', 400);
-    }
+    // 检查 users 表是否重复
+    const [existingUsers] = await pool.execute('SELECT userId FROM users WHERE username = ?', [username]);
+    if (existingUsers.length > 0) return error(res, '用户名已存在', 400);
 
-    // 加密密码
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 插入用户
     const [result] = await pool.execute(
-      `INSERT INTO users (username, password, role, realName, phone, roomNumber, building) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [username, hashedPassword, userRole, realName || null, phone || null, roomNumber || null, building || null]
+      'INSERT INTO users (username, password, role, realName, phone, roomNumber, building) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [username, hashedPassword, 'student', realName, phone, roomNumber, building]
     );
 
-    return success(res, { userId: result.insertId, username, role: userRole }, '注册成功');
+    // 标记住户已注册
+    await pool.execute('UPDATE residents SET isRegistered = TRUE WHERE residentId = ?', [residents[0].residentId]);
+
+    return success(res, { userId: result.insertId, username, role: 'student' }, '注册成功');
   } catch (err) {
     console.error('注册错误:', err);
     return error(res, '注册失败，请稍后重试', 500);
@@ -114,39 +104,26 @@ const login = async (req, res) => {
 // 重置密码
 const resetPassword = async (req, res) => {
   try {
-    const { username, newPassword, confirmPassword } = req.body;
+    const { username, realName, phone, building, roomNumber, qqEmail, newPassword, confirmPassword } = req.body;
 
-    // 输入验证
-    if (!username || !newPassword || !confirmPassword) {
-      return error(res, '用户名、新密码和确认密码不能为空', 400);
+    if (!username || !realName || !phone || !building || !roomNumber || !qqEmail || !newPassword || !confirmPassword) {
+      return error(res, '所有字段均为必填', 400);
     }
+    if (newPassword !== confirmPassword) return error(res, '两次输入的密码不一致', 400);
+    if (newPassword.length < 6) return error(res, '密码长度不能少于6位', 400);
 
-    if (newPassword !== confirmPassword) {
-      return error(res, '两次输入的密码不一致', 400);
-    }
-
-    if (newPassword.length < 6) {
-      return error(res, '密码长度不能少于6位', 400);
-    }
-
-    // 检查用户是否存在
-    const [users] = await pool.execute(
-      'SELECT userId FROM users WHERE username = ?',
-      [username]
+    // 核对住户表
+    const [residents] = await pool.execute(
+      'SELECT residentId FROM residents WHERE studentId=? AND name=? AND phone=? AND building=? AND roomNumber=? AND qqEmail=?',
+      [username, realName, phone, building, roomNumber, qqEmail]
     );
+    if (residents.length === 0) return error(res, '个人信息与住户记录不匹配', 400);
 
-    if (users.length === 0) {
-      return error(res, '用户不存在', 404);
-    }
+    const [users] = await pool.execute('SELECT userId FROM users WHERE username = ?', [username]);
+    if (users.length === 0) return error(res, '该学号尚未注册账号', 404);
 
-    // 加密新密码
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // 更新密码
-    await pool.execute(
-      'UPDATE users SET password = ? WHERE username = ?',
-      [hashedPassword, username]
-    );
+    await pool.execute('UPDATE users SET password = ? WHERE username = ?', [hashedPassword, username]);
 
     return success(res, null, '密码重置成功');
   } catch (err) {
