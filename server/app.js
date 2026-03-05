@@ -22,6 +22,7 @@ app.use('/api/evaluations', require('./routes/evaluations'));
 app.use('/api/announcements', require('./routes/announcements'));
 app.use('/api/admin/residents', require('./routes/residents'));
 app.use('/api/admin/repairmen', require('./routes/adminRepairmen'));
+app.use('/api/repairman', require('./routes/repairman'));
 
 // Health check
 app.get('/health', (req, res) => {

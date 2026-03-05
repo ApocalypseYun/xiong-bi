@@ -143,8 +143,65 @@ const getOrderById = async (req, res) => {
   }
 };
 
+// 催促订单（学生操作，订单超过6小时未接单）
+const urgeOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const orderId = parseInt(id, 10);
+    if (isNaN(orderId)) return error(res, '无效的订单ID', 400);
+    const userId = req.user.userId;
+    const [orders] = await pool.execute(
+      'SELECT orderId, userId, status, createdAt, lastUrgedAt FROM repairOrders WHERE orderId = ?', [orderId]
+    );
+    if (orders.length === 0) return error(res, '订单不存在', 404);
+    const order = orders[0];
+    if (order.userId !== userId) return error(res, '无权操作此订单', 403);
+    if (order.status !== 'pending') return error(res, '只能催促待接单的订单', 400);
+
+    const now = new Date();
+    const createdAt = new Date(order.createdAt);
+    const hoursSinceCreation = (now - createdAt) / (1000 * 60 * 60);
+    if (hoursSinceCreation < 6) {
+      const remainHours = (6 - hoursSinceCreation).toFixed(1);
+      return error(res, `暂不可催促，请于 ${remainHours} 小时后再尝试`, 400);
+    }
+
+    await pool.execute(
+      'UPDATE repairOrders SET lastUrgedAt = NOW(), urgeCount = urgeCount + 1 WHERE orderId = ?',
+      [orderId]
+    );
+    return success(res, null, '催促成功，管理员将尽快处理');
+  } catch (err) {
+    console.error('催促订单错误:', err);
+    return error(res, '催促失败', 500);
+  }
+};
+
+// 撤回订单（只能撤回 pending 状态的自己的订单）
+const withdrawOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const orderId = parseInt(id, 10);
+    if (isNaN(orderId)) return error(res, '无效的订单ID', 400);
+    const userId = req.user.userId;
+    const [orders] = await pool.execute(
+      'SELECT orderId, userId, status FROM repairOrders WHERE orderId = ?', [orderId]
+    );
+    if (orders.length === 0) return error(res, '订单不存在', 404);
+    if (orders[0].userId !== userId) return error(res, '无权操作此订单', 403);
+    if (orders[0].status !== 'pending') return error(res, '只能撤回待接单的订单', 400);
+    await pool.execute('UPDATE repairOrders SET status = ? WHERE orderId = ?', ['withdrawn', orderId]);
+    return success(res, null, '订单已撤回');
+  } catch (err) {
+    console.error('撤回订单错误:', err);
+    return error(res, '撤回失败', 500);
+  }
+};
+
 module.exports = {
   createOrder,
   getOrders,
-  getOrderById
+  getOrderById,
+  urgeOrder,
+  withdrawOrder
 };

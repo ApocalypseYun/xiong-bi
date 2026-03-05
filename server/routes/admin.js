@@ -4,16 +4,14 @@ const { authenticate, authorize } = require('../middleware/auth');
 const {
   getAllOrders,
   getPendingOrders,
-  acceptOrder,
-  completeOrder
+  getUrgedOrders
 } = require('../controllers/adminController');
 
 router.use(authenticate);
-router.use(authorize(['admin']));
+router.use(authorize(['super_admin']));
 
 router.get('/orders', getAllOrders);
 router.get('/orders/pending', getPendingOrders);
-router.put('/orders/:id/accept', acceptOrder);
-router.put('/orders/:id/complete', completeOrder);
+router.get('/orders/urged', getUrgedOrders);
 
 module.exports = router;

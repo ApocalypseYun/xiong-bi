@@ -189,9 +189,28 @@ const completeOrder = async (req, res) => {
   }
 };
 
+// 获取被催促的订单（超管首页提示用）
+const getUrgedOrders = async (req, res) => {
+  try {
+    const [orders] = await pool.execute(`
+      SELECT o.orderId, o.repairType, o.building, o.roomNumber, o.createdAt,
+             o.urgeCount, o.lastUrgedAt, u.realName as userRealName
+      FROM repairOrders o
+      LEFT JOIN users u ON o.userId = u.userId
+      WHERE o.status = 'pending' AND o.urgeCount > 0
+      ORDER BY o.lastUrgedAt DESC
+    `);
+    return success(res, orders, '获取催促订单成功');
+  } catch (err) {
+    console.error('获取催促订单错误:', err);
+    return error(res, '获取催促订单失败', 500);
+  }
+};
+
 module.exports = {
   getAllOrders,
   getPendingOrders,
   acceptOrder,
-  completeOrder
+  completeOrder,
+  getUrgedOrders
 };

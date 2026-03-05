@@ -110,8 +110,23 @@ const getAllEvaluations = async (req, res) => {
   }
 };
 
+// 获取单个订单评价
+const getOrderEvaluation = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const orderIdNum = parseInt(orderId, 10);
+    if (isNaN(orderIdNum)) return error(res, '无效的订单ID', 400);
+    const [rows] = await pool.execute('SELECT * FROM evaluations WHERE orderId = ?', [orderIdNum]);
+    return success(res, rows.length > 0 ? rows[0] : null, '获取评价成功');
+  } catch (err) {
+    console.error('获取评价错误:', err);
+    return error(res, '获取评价失败', 500);
+  }
+};
+
 module.exports = {
   createEvaluation,
   getMyEvaluations,
-  getAllEvaluations
+  getAllEvaluations,
+  getOrderEvaluation
 };

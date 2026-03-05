@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const { authenticate, authorize } = require('../middleware/auth');
-const { createEvaluation, getMyEvaluations, getAllEvaluations } = require('../controllers/evaluationController');
+const { createEvaluation, getMyEvaluations, getAllEvaluations, getOrderEvaluation } = require('../controllers/evaluationController');
 
 // 学生评价路由（需要认证）
 router.post('/', authenticate, createEvaluation);
 router.get('/', authenticate, getMyEvaluations);
 
 // 管理员评价路由
-router.get('/admin', authenticate, authorize(['admin']), getAllEvaluations);
+router.get('/admin', authenticate, authorize(['super_admin']), getAllEvaluations);
+
+// 获取单个订单评价
+router.get('/order/:orderId', authenticate, getOrderEvaluation);
 
 module.exports = router;
