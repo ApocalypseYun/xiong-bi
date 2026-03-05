@@ -59,13 +59,20 @@ const acceptOrder = async (req, res) => {
     const orderId = parseInt(id, 10);
     if (isNaN(orderId)) return error(res, '无效的订单ID', 400);
     const repairmanId = req.user.userId;
-    const [orders] = await pool.execute('SELECT orderId, status FROM repairOrders WHERE orderId = ?', [orderId]);
+
+    // Check order exists first
+    const [orders] = await pool.execute('SELECT orderId FROM repairOrders WHERE orderId = ?', [orderId]);
     if (orders.length === 0) return error(res, '订单不存在', 404);
-    if (orders[0].status !== 'pending') return error(res, '该订单已被接单或已完成', 400);
-    await pool.execute(
-      'UPDATE repairOrders SET status = ?, repairmanId = ? WHERE orderId = ?',
-      ['processing', repairmanId, orderId]
+
+    // Atomic update - only succeeds if status is still 'pending'
+    const [result] = await pool.execute(
+      "UPDATE repairOrders SET status = 'processing', repairmanId = ? WHERE orderId = ? AND status = 'pending'",
+      [repairmanId, orderId]
     );
+    if (result.affectedRows === 0) {
+      return error(res, '该订单已被接单或已完成', 400);
+    }
+
     return success(res, { orderId, status: 'processing' }, '接单成功');
   } catch (err) {
     console.error('接单错误:', err);
@@ -79,20 +86,35 @@ const completeOrder = async (req, res) => {
   try {
     const { id } = req.params;
     const orderId = parseInt(id, 10);
-    if (isNaN(orderId)) return error(res, '无效的订单ID', 400);
+    if (isNaN(orderId)) {
+      connection.release();
+      return error(res, '无效的订单ID', 400);
+    }
     const { completionImageUrls } = req.body;
     const repairmanId = req.user.userId;
     if (!completionImageUrls || !Array.isArray(completionImageUrls) || completionImageUrls.length === 0) {
+      connection.release();
       return error(res, '请上传完成凭证图片', 400);
     }
-    const [orders] = await connection.execute(
-      'SELECT orderId, status, repairmanId FROM repairOrders WHERE orderId = ?', [orderId]
-    );
-    if (orders.length === 0) return error(res, '订单不存在', 404);
-    if (orders[0].status !== 'processing') return error(res, '只能完成进行中的订单', 400);
-    if (orders[0].repairmanId !== repairmanId) return error(res, '只能完成自己接单的订单', 403);
 
     await connection.beginTransaction();
+
+    const [orders] = await connection.execute(
+      'SELECT orderId, status, repairmanId FROM repairOrders WHERE orderId = ? FOR UPDATE', [orderId]
+    );
+    if (orders.length === 0) {
+      await connection.rollback();
+      return error(res, '订单不存在', 404);
+    }
+    if (orders[0].status !== 'processing') {
+      await connection.rollback();
+      return error(res, '只能完成进行中的订单', 400);
+    }
+    if (orders[0].repairmanId !== repairmanId) {
+      await connection.rollback();
+      return error(res, '只能完成自己接单的订单', 403);
+    }
+
     await connection.execute(
       'UPDATE repairOrders SET status = ?, completedAt = NOW() WHERE orderId = ?',
       ['completed', orderId]
