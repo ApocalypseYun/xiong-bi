@@ -20,6 +20,7 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/evaluations', require('./routes/evaluations'));
 app.use('/api/announcements', require('./routes/announcements'));
+app.use('/api/admin/residents', require('./routes/residents'));
 
 // Health check
 app.get('/health', (req, res) => {
