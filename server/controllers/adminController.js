@@ -92,103 +92,6 @@ const getPendingOrders = async (req, res) => {
   }
 };
 
-// 接单
-const acceptOrder = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const adminId = req.user.userId;
-
-    // 检查订单是否存在且状态为pending
-    const [orders] = await pool.execute(
-      'SELECT orderId, status FROM repairOrders WHERE orderId = ?',
-      [id]
-    );
-
-    if (orders.length === 0) {
-      return error(res, '订单不存在', 404);
-    }
-
-    if (orders[0].status !== 'pending') {
-      return error(res, '该订单已被处理或已完成', 400);
-    }
-
-    // 更新订单状态为processing，并记录adminId
-    await pool.execute(
-      'UPDATE repairOrders SET status = ?, adminId = ? WHERE orderId = ?',
-      ['processing', adminId, id]
-    );
-
-    return success(res, { orderId: parseInt(id), status: 'processing' }, '接单成功');
-  } catch (err) {
-    console.error('接单错误:', err);
-    return error(res, '接单失败', 500);
-  }
-};
-
-// 完成订单（上传凭证）
-const completeOrder = async (req, res) => {
-  const connection = await pool.getConnection();
-  
-  try {
-    const { id } = req.params;
-    const { completionImageUrls } = req.body;
-    const adminId = req.user.userId;
-
-    // 验证凭证图片
-    if (!completionImageUrls || !Array.isArray(completionImageUrls) || completionImageUrls.length === 0) {
-      return error(res, '请上传完成凭证图片', 400);
-    }
-
-    // 检查订单是否存在且状态为processing
-    const [orders] = await connection.execute(
-      'SELECT orderId, status, adminId FROM repairOrders WHERE orderId = ?',
-      [id]
-    );
-
-    if (orders.length === 0) {
-      return error(res, '订单不存在', 404);
-    }
-
-    const order = orders[0];
-    
-    if (order.status !== 'processing') {
-      if (order.status === 'pending') {
-        return error(res, '请先接单再完成', 400);
-      }
-      return error(res, '该订单已完成', 400);
-    }
-
-    // 开始事务
-    await connection.beginTransaction();
-
-    // 更新订单状态为completed
-    await connection.execute(
-      'UPDATE repairOrders SET status = ?, completedAt = NOW() WHERE orderId = ?',
-      ['completed', id]
-    );
-
-    // 插入完成凭证图片
-    for (const imageUrl of completionImageUrls) {
-      await connection.execute(
-        'INSERT INTO completionImages (orderId, imageUrl, uploadedBy) VALUES (?, ?, ?)',
-        [id, imageUrl, adminId]
-      );
-    }
-
-    // 提交事务
-    await connection.commit();
-
-    return success(res, { orderId: parseInt(id), status: 'completed' }, '完成报修');
-  } catch (err) {
-    // 回滚事务
-    await connection.rollback();
-    console.error('完成订单错误:', err);
-    return error(res, '完成订单失败', 500);
-  } finally {
-    connection.release();
-  }
-};
-
 // 获取被催促的订单（超管首页提示用）
 const getUrgedOrders = async (req, res) => {
   try {
@@ -210,7 +113,5 @@ const getUrgedOrders = async (req, res) => {
 module.exports = {
   getAllOrders,
   getPendingOrders,
-  acceptOrder,
-  completeOrder,
   getUrgedOrders
 };
