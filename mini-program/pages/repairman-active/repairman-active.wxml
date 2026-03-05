@@ -1,1 +1,38 @@
-<view>loading...</view>
+<view class="container">
+  <view class="page-title">我的订单</view>
+
+  <view class="section-title">进行中订单</view>
+  <view wx:if="{{processingOrders.length === 0}}" class="empty">暂无进行中订单</view>
+  <view class="order-card" wx:for="{{processingOrders}}" wx:key="orderId">
+    <text class="repair-type">{{item.repairType}}</text>
+    <text class="order-location">{{item.building}} {{item.roomNumber}}</text>
+    <text class="order-desc">{{item.description}}</text>
+    <text class="order-user">报修人: {{item.userRealName}}</text>
+    <button class="complete-btn" bindtap="handleComplete" data-id="{{item.orderId}}">上传凭证并完成</button>
+  </view>
+
+  <view class="section-title" style="margin-top:40rpx">已完成订单</view>
+  <view wx:if="{{completedOrders.length === 0}}" class="empty">暂无已完成订单</view>
+  <view class="order-card" wx:for="{{completedOrders}}" wx:key="orderId">
+    <text class="repair-type">{{item.repairType}}</text>
+    <text class="order-location">{{item.building}} {{item.roomNumber}}</text>
+    <text class="order-status completed">已完成</text>
+    <button wx:if="{{item.hasUserEval && !item.hasRepairmanEval}}" class="eval-btn" bindtap="openEvalModal" data-id="{{item.orderId}}">评价用户</button>
+    <text wx:elif="{{item.hasRepairmanEval}}" class="eval-done">已评价</text>
+    <text wx:else class="eval-wait">等待用户评价后可评价</text>
+  </view>
+
+  <!-- 评价弹窗 -->
+  <view class="modal-overlay" wx:if="{{showEvalModal}}">
+    <view class="modal">
+      <text class="modal-title">评价用户</text>
+      <text class="modal-label">评分 (1-5)</text>
+      <slider min="1" max="5" value="{{evalRating}}" show-value bindchange="onRatingChange" />
+      <textarea placeholder="评价内容（选填）" bindinput="onCommentInput" class="eval-textarea" />
+      <view class="modal-btns">
+        <button bindtap="closeEvalModal" class="cancel-btn">取消</button>
+        <button bindtap="submitEval" class="submit-btn">提交</button>
+      </view>
+    </view>
+  </view>
+</view>

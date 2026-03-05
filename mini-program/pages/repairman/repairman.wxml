@@ -1,1 +1,32 @@
-<view>loading...</view>
+<view class="container">
+  <view class="header">
+    <text class="title">维修工工作台</text>
+    <text class="subtitle">{{userInfo.realName || userInfo.username}}</text>
+  </view>
+
+  <view class="stats-row">
+    <view class="stat-card" bindtap="goToPending">
+      <text class="stat-num">{{pendingCount}}</text>
+      <text class="stat-label">待接单</text>
+    </view>
+    <view class="stat-card" bindtap="goToActive">
+      <text class="stat-num">{{myActiveOrders.length}}</text>
+      <text class="stat-label">进行中</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-num">{{myCompletedCount}}</text>
+      <text class="stat-label">已完成</text>
+    </view>
+  </view>
+
+  <view class="section-title" wx:if="{{myActiveOrders.length > 0}}">我的进行中订单</view>
+  <view class="order-list">
+    <view class="order-item" wx:for="{{myActiveOrders}}" wx:key="orderId" bindtap="goToActive">
+      <text class="order-type">{{item.repairType}}</text>
+      <text class="order-room">{{item.building}} {{item.roomNumber}}</text>
+      <text class="order-status processing">维修中</text>
+    </view>
+  </view>
+
+  <button class="logout-btn" bindtap="handleLogout">退出登录</button>
+</view>

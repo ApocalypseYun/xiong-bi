@@ -1,1 +1,22 @@
-<view>loading...</view>
+<view class="container">
+  <view class="page-title">待接单列表</view>
+  <view wx:if="{{isLoading}}" class="loading">加载中...</view>
+  <view wx:elif="{{orders.length === 0}}" class="empty">暂无待接单订单</view>
+  <view wx:else>
+    <view class="order-card" wx:for="{{orders}}" wx:key="orderId">
+      <view class="order-header">
+        <text class="repair-type">{{item.repairType}}</text>
+        <text wx:if="{{item.urgeCount > 0}}" class="urged-badge">催促×{{item.urgeCount}}</text>
+      </view>
+      <text class="order-location">{{item.building}} {{item.roomNumber}}</text>
+      <text class="order-desc">{{item.description}}</text>
+      <text class="order-user">报修人: {{item.userRealName}}</text>
+      <text class="order-contact">联系电话: {{item.contactPhone}}</text>
+      <text class="order-time">提交时间: {{item.createdAt}}</text>
+      <view class="image-list" wx:if="{{item.images.length > 0}}">
+        <image wx:for="{{item.images}}" wx:for-item="img" wx:key="imageUrl" src="{{img.imageUrl}}" mode="aspectFill" class="order-img" />
+      </view>
+      <button class="accept-btn" bindtap="handleAccept" data-id="{{item.orderId}}">接单</button>
+    </view>
+  </view>
+</view>
