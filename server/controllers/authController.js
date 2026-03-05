@@ -6,6 +6,7 @@ const { JWT_SECRET } = require('../middleware/auth');
 
 // 用户注册
 const register = async (req, res) => {
+  const connection = await pool.getConnection();
   try {
     const { username, password, confirmPassword, realName, phone, roomNumber, building, qqEmail } = req.body;
 
@@ -18,31 +19,46 @@ const register = async (req, res) => {
     const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailReg.test(qqEmail)) return error(res, 'QQ邮箱格式不正确', 400);
 
-    // 核对住户表（学号即用户名）
-    const [residents] = await pool.execute(
-      'SELECT residentId, isRegistered FROM residents WHERE studentId=? AND name=? AND phone=? AND building=? AND roomNumber=? AND qqEmail=?',
+    await connection.beginTransaction();
+
+    // 核对住户表，使用 FOR UPDATE 锁行防并发重复注册
+    const [residents] = await connection.execute(
+      'SELECT residentId, isRegistered FROM residents WHERE studentId=? AND name=? AND phone=? AND building=? AND roomNumber=? AND qqEmail=? FOR UPDATE',
       [username, realName, phone, building, roomNumber, qqEmail]
     );
-    if (residents.length === 0) return error(res, '个人信息与住户记录不匹配，请核对后重试', 400);
-    if (residents[0].isRegistered) return error(res, '该学号已注册账号', 400);
+    if (residents.length === 0) {
+      await connection.rollback();
+      return error(res, '个人信息与住户记录不匹配，请核对后重试', 400);
+    }
+    if (residents[0].isRegistered) {
+      await connection.rollback();
+      return error(res, '该学号已注册账号', 400);
+    }
 
     // 检查 users 表是否重复
-    const [existingUsers] = await pool.execute('SELECT userId FROM users WHERE username = ?', [username]);
-    if (existingUsers.length > 0) return error(res, '用户名已存在', 400);
+    const [existingUsers] = await connection.execute('SELECT userId FROM users WHERE username = ?', [username]);
+    if (existingUsers.length > 0) {
+      await connection.rollback();
+      return error(res, '用户名已存在', 400);
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const [result] = await pool.execute(
+    const [result] = await connection.execute(
       'INSERT INTO users (username, password, role, realName, phone, roomNumber, building) VALUES (?, ?, ?, ?, ?, ?, ?)',
       [username, hashedPassword, 'student', realName, phone, roomNumber, building]
     );
 
     // 标记住户已注册
-    await pool.execute('UPDATE residents SET isRegistered = TRUE WHERE residentId = ?', [residents[0].residentId]);
+    await connection.execute('UPDATE residents SET isRegistered = TRUE WHERE residentId = ?', [residents[0].residentId]);
 
+    await connection.commit();
     return success(res, { userId: result.insertId, username, role: 'student' }, '注册成功');
   } catch (err) {
+    await connection.rollback();
     console.error('注册错误:', err);
     return error(res, '注册失败，请稍后重试', 500);
+  } finally {
+    connection.release();
   }
 };
 
