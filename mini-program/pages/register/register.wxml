@@ -1,150 +1,103 @@
-<view class="register-container">
-  <view class="header">
-    <view class="back-btn" bindtap="goBack"><text>←</text></view>
-    <view class="header-title">注册账号</view>
+<!--register.wxml-->
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">学生注册</text>
+    <text class="page-subtitle">请填写与住户记录一致的信息</text>
   </view>
 
-  <view class="register-card">
-    <view class="role-section">
-      <view class="section-title">选择角色</view>
-      <view class="role-tabs">
-        <view class="role-tab {{role === 'student' ? 'active' : ''}}" bindtap="switchRole" data-role="student">
-          <text class="role-tab-icon">👨‍🎓</text>
-          <text>学生</text>
-        </view>
-        <view class="role-tab {{role === 'admin' ? 'active' : ''}}" bindtap="switchRole" data-role="admin">
-          <text class="role-tab-icon">👨‍💼</text>
-          <text>管理员</text>
-        </view>
+  <view class="form-card">
+    <!-- 学号 -->
+    <view class="input-group">
+      <text class="input-label">学号</text>
+      <view class="input-wrapper {{errors.username ? 'error' : ''}}">
+        <input class="input-field" placeholder="请输入学号" value="{{username}}"
+          bindinput="onInput" data-field="username" />
       </view>
+      <text class="error-tip" wx:if="{{errors.username}}">{{errors.username}}</text>
     </view>
 
-    <view class="form-section">
-      <view class="input-group">
-        <text class="input-label">用户名<text class="required">*</text></text>
-        <view class="input-wrapper {{errors.username ? 'error' : ''}}">
-          <text class="input-icon">👤</text>
-          <input 
-            class="input-field" 
-            placeholder="3-20位字母数字下划线" 
-            value="{{username}}"
-            data-field="username"
-            bindinput="onInput"
-          />
-        </view>
-        <text class="error-tip" wx:if="{{errors.username}}">{{errors.username}}</text>
+    <!-- 真实姓名 -->
+    <view class="input-group">
+      <text class="input-label">真实姓名</text>
+      <view class="input-wrapper {{errors.realName ? 'error' : ''}}">
+        <input class="input-field" placeholder="请输入真实姓名" value="{{realName}}"
+          bindinput="onInput" data-field="realName" />
       </view>
-
-      <view class="input-group">
-        <text class="input-label">密码<text class="required">*</text></text>
-        <view class="input-wrapper {{errors.password ? 'error' : ''}}">
-          <text class="input-icon">🔒</text>
-          <input 
-            class="input-field" 
-            placeholder="至少6位密码" 
-            password="{{!showPassword}}"
-            value="{{password}}"
-            data-field="password"
-            bindinput="onInput"
-          />
-          <view class="password-toggle" bindtap="togglePassword" data-field="showPassword">
-            <text>{{showPassword ? '🙈' : '👁️'}}</text>
-          </view>
-        </view>
-        <text class="error-tip" wx:if="{{errors.password}}">{{errors.password}}</text>
-      </view>
-
-      <view class="input-group">
-        <text class="input-label">确认密码<text class="required">*</text></text>
-        <view class="input-wrapper {{errors.confirmPassword ? 'error' : ''}}">
-          <text class="input-icon">🔐</text>
-          <input 
-            class="input-field" 
-            placeholder="再次输入密码" 
-            password="{{!showConfirmPassword}}"
-            value="{{confirmPassword}}"
-            data-field="confirmPassword"
-            bindinput="onInput"
-          />
-          <view class="password-toggle" bindtap="togglePassword" data-field="showConfirmPassword">
-            <text>{{showConfirmPassword ? '🙈' : '👁️'}}</text>
-          </view>
-        </view>
-        <text class="error-tip" wx:if="{{errors.confirmPassword}}">{{errors.confirmPassword}}</text>
-      </view>
-
-      <block wx:if="{{role === 'student'}}">
-        <view class="input-group">
-          <text class="input-label">真实姓名</text>
-          <view class="input-wrapper">
-            <text class="input-icon">✏️</text>
-            <input 
-              class="input-field" 
-              placeholder="请输入真实姓名" 
-              value="{{realName}}"
-              data-field="realName"
-              bindinput="onInput"
-            />
-          </view>
-        </view>
-
-        <view class="input-group">
-          <text class="input-label">手机号<text class="required">*</text></text>
-          <view class="input-wrapper {{errors.phone ? 'error' : ''}}">
-            <text class="input-icon">📱</text>
-            <input 
-              class="input-field" 
-              placeholder="请输入手机号" 
-              type="number"
-              maxlength="11"
-              value="{{phone}}"
-              data-field="phone"
-              bindinput="onInput"
-            />
-          </view>
-          <text class="error-tip" wx:if="{{errors.phone}}">{{errors.phone}}</text>
-        </view>
-
-        <view class="form-row">
-          <view class="input-group">
-            <text class="input-label">楼栋<text class="required">*</text></text>
-            <view class="input-wrapper {{errors.building ? 'error' : ''}}">
-              <text class="input-icon">🏢</text>
-              <input 
-                class="input-field" 
-                placeholder="如:A栋" 
-                value="{{building}}"
-                data-field="building"
-                bindinput="onInput"
-              />
-            </view>
-            <text class="error-tip" wx:if="{{errors.building}}">{{errors.building}}</text>
-          </view>
-
-          <view class="input-group">
-            <text class="input-label">房间号<text class="required">*</text></text>
-            <view class="input-wrapper {{errors.roomNumber ? 'error' : ''}}">
-              <text class="input-icon">🚪</text>
-              <input 
-                class="input-field" 
-                placeholder="如:101" 
-                value="{{roomNumber}}"
-                data-field="roomNumber"
-                bindinput="onInput"
-              />
-            </view>
-            <text class="error-tip" wx:if="{{errors.roomNumber}}">{{errors.roomNumber}}</text>
-          </view>
-        </view>
-      </block>
+      <text class="error-tip" wx:if="{{errors.realName}}">{{errors.realName}}</text>
     </view>
 
-    <button class="register-btn" bindtap="handleRegister" disabled="{{isLoading}}">
-      {{isLoading ? '注册中...' : '立即注册'}}
+    <!-- 手机号 -->
+    <view class="input-group">
+      <text class="input-label">手机号</text>
+      <view class="input-wrapper {{errors.phone ? 'error' : ''}}">
+        <input class="input-field" type="number" placeholder="请输入手机号" value="{{phone}}"
+          bindinput="onInput" data-field="phone" />
+      </view>
+      <text class="error-tip" wx:if="{{errors.phone}}">{{errors.phone}}</text>
+    </view>
+
+    <!-- 栋数 -->
+    <view class="input-group">
+      <text class="input-label">栋数</text>
+      <view class="input-wrapper {{errors.building ? 'error' : ''}}">
+        <input class="input-field" placeholder="如：A栋" value="{{building}}"
+          bindinput="onInput" data-field="building" />
+      </view>
+      <text class="error-tip" wx:if="{{errors.building}}">{{errors.building}}</text>
+    </view>
+
+    <!-- 寝室号 -->
+    <view class="input-group">
+      <text class="input-label">寝室号</text>
+      <view class="input-wrapper {{errors.roomNumber ? 'error' : ''}}">
+        <input class="input-field" placeholder="如：101" value="{{roomNumber}}"
+          bindinput="onInput" data-field="roomNumber" />
+      </view>
+      <text class="error-tip" wx:if="{{errors.roomNumber}}">{{errors.roomNumber}}</text>
+    </view>
+
+    <!-- QQ邮箱 -->
+    <view class="input-group">
+      <text class="input-label">QQ邮箱</text>
+      <view class="input-wrapper {{errors.qqEmail ? 'error' : ''}}">
+        <input class="input-field" type="email" placeholder="请输入QQ邮箱" value="{{qqEmail}}"
+          bindinput="onInput" data-field="qqEmail" />
+      </view>
+      <text class="error-tip" wx:if="{{errors.qqEmail}}">{{errors.qqEmail}}</text>
+    </view>
+
+    <!-- 密码 -->
+    <view class="input-group">
+      <text class="input-label">密码</text>
+      <view class="input-wrapper {{errors.password ? 'error' : ''}}">
+        <input class="input-field" password="{{!showPassword}}" placeholder="请输入密码（至少6位）"
+          value="{{password}}" bindinput="onInput" data-field="password" />
+        <view class="password-toggle" bindtap="togglePassword" data-field="showPassword">
+          <text>{{showPassword ? '🙈' : '👁️'}}</text>
+        </view>
+      </view>
+      <text class="error-tip" wx:if="{{errors.password}}">{{errors.password}}</text>
+    </view>
+
+    <!-- 确认密码 -->
+    <view class="input-group">
+      <text class="input-label">确认密码</text>
+      <view class="input-wrapper {{errors.confirmPassword ? 'error' : ''}}">
+        <input class="input-field" password="{{!showConfirmPassword}}" placeholder="请再次输入密码"
+          value="{{confirmPassword}}" bindinput="onInput" data-field="confirmPassword" />
+        <view class="password-toggle" bindtap="togglePassword" data-field="showConfirmPassword">
+          <text>{{showConfirmPassword ? '🙈' : '👁️'}}</text>
+        </view>
+      </view>
+      <text class="error-tip" wx:if="{{errors.confirmPassword}}">{{errors.confirmPassword}}</text>
+    </view>
+
+    <button class="register-btn {{isLoading ? 'loading' : ''}}" bindtap="handleRegister" disabled="{{isLoading}}">
+      {{isLoading ? '注册中...' : '注 册'}}
     </button>
 
-    <view class="bottom-tip">
-      <text class="tip-text">已有账号？<text class="tip-link" bindtap="goBack">立即登录</text></text>
+    <view class="back-link" bindtap="goBack">
+      <text>返回登录</text>
     </view>
   </view>
 </view>
