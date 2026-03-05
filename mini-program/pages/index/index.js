@@ -138,7 +138,7 @@ Page({
         });
 
         setTimeout(() => {
-          this.redirectByRole(role);
+          this.redirectByRole(res.data.user.role);
         }, 1500);
       } else {
         wx.showToast({
@@ -157,9 +157,13 @@ Page({
   },
 
   redirectByRole(role) {
-    if (role === 'admin') {
+    if (role === 'super_admin') {
       wx.redirectTo({
         url: '/pages/admin/admin'
+      });
+    } else if (role === 'repairman') {
+      wx.redirectTo({
+        url: '/pages/repairman/repairman'
       });
     } else {
       wx.redirectTo({

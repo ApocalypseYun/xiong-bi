@@ -12,7 +12,12 @@
     "pages/admin-pending/admin-pending",
     "pages/admin-completed/admin-completed",
     "pages/admin-announcements/admin-announcements",
-    "pages/admin-evaluations/admin-evaluations"
+    "pages/admin-evaluations/admin-evaluations",
+    "pages/repairman/repairman",
+    "pages/repairman-orders/repairman-orders",
+    "pages/repairman-active/repairman-active",
+    "pages/admin-residents/admin-residents",
+    "pages/admin-repairmen/admin-repairmen"
   ],
   "window": {
     "backgroundTextStyle": "light",
