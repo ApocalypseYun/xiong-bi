@@ -41,16 +41,18 @@ const createRepairman = async (req, res) => {
 const updateRepairman = async (req, res) => {
   try {
     const { id } = req.params;
+    const numId = parseInt(id, 10);
+    if (isNaN(numId)) return error(res, '无效的ID', 400);
     const { realName, phone, password } = req.body;
     if (!realName || !phone) return error(res, '姓名和手机号均为必填', 400);
-    const [exist] = await pool.execute("SELECT userId FROM users WHERE userId = ? AND role = 'repairman'", [id]);
+    const [exist] = await pool.execute("SELECT userId FROM users WHERE userId = ? AND role = 'repairman'", [numId]);
     if (exist.length === 0) return error(res, '维修工不存在', 404);
     if (password) {
       if (password.length < 6) return error(res, '密码不能少于6位', 400);
       const hashed = await bcrypt.hash(password, 10);
-      await pool.execute('UPDATE users SET realName=?, phone=?, password=? WHERE userId=?', [realName, phone, hashed, id]);
+      await pool.execute('UPDATE users SET realName=?, phone=?, password=? WHERE userId=?', [realName, phone, hashed, numId]);
     } else {
-      await pool.execute('UPDATE users SET realName=?, phone=? WHERE userId=?', [realName, phone, id]);
+      await pool.execute('UPDATE users SET realName=?, phone=? WHERE userId=?', [realName, phone, numId]);
     }
     return success(res, null, '更新维修工成功');
   } catch (err) {
@@ -63,9 +65,16 @@ const updateRepairman = async (req, res) => {
 const deleteRepairman = async (req, res) => {
   try {
     const { id } = req.params;
-    const [exist] = await pool.execute("SELECT userId FROM users WHERE userId = ? AND role = 'repairman'", [id]);
+    const numId = parseInt(id, 10);
+    if (isNaN(numId)) return error(res, '无效的ID', 400);
+    const [exist] = await pool.execute("SELECT userId FROM users WHERE userId = ? AND role = 'repairman'", [numId]);
     if (exist.length === 0) return error(res, '维修工不存在', 404);
-    await pool.execute('DELETE FROM users WHERE userId = ?', [id]);
+    const [activeOrders] = await pool.execute(
+      "SELECT orderId FROM repairOrders WHERE repairmanId = ? AND status = 'processing'",
+      [numId]
+    );
+    if (activeOrders.length > 0) return error(res, '该维修工有进行中的订单，无法删除', 400);
+    await pool.execute('DELETE FROM users WHERE userId = ?', [numId]);
     return success(res, null, '删除维修工成功');
   } catch (err) {
     console.error('删除维修工错误:', err);
