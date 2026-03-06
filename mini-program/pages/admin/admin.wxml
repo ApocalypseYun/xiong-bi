@@ -62,6 +62,17 @@
         <view class="action-icon evaluation">⭐</view>
         <text class="action-name">我的评价</text>
       </view>
+
+      <view class="menu-item action-item" bindtap="goToResidents">
+        <text class="menu-label action-name">住户管理</text>
+      </view>
+      <view class="menu-item action-item" bindtap="goToRepairmen">
+        <text class="menu-label action-name">维修工管理</text>
+      </view>
+      <view class="menu-item action-item urged-item" bindtap="goToUrged">
+        <text class="menu-label action-name">催促提醒</text>
+        <text wx:if="{{urgedCount > 0}}" class="badge">{{urgedCount}}</text>
+      </view>
     </view>
   </view>
 

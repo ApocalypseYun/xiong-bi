@@ -5,6 +5,7 @@ Page({
   data: {
     userInfo: null,
     pendingCount: 0,
+    urgedCount: 0,
     loading: false
   },
 
@@ -54,14 +55,14 @@ Page({
 
   loadPendingCount() {
     this.setData({ loading: true });
-    
+
     get('/admin/orders/pending')
       .then(res => {
         if (res.code === 200) {
           const pendingCount = (res.data || []).length;
-          this.setData({ 
+          this.setData({
             pendingCount,
-            loading: false 
+            loading: false
           });
         } else {
           this.setData({ loading: false });
@@ -79,6 +80,12 @@ Page({
           icon: 'none'
         });
       });
+
+    get('/admin/orders/urged')
+      .then(urgedRes => {
+        this.setData({ urgedCount: urgedRes.code === 200 ? urgedRes.data.length : 0 });
+      })
+      .catch(() => {});
   },
 
   goToPendingOrders() {
@@ -104,6 +111,10 @@ Page({
       url: '/pages/admin-evaluations/admin-evaluations'
     });
   },
+
+  goToResidents() { wx.navigateTo({ url: '/pages/admin-residents/admin-residents' }); },
+  goToRepairmen() { wx.navigateTo({ url: '/pages/admin-repairmen/admin-repairmen' }); },
+  goToUrged() { wx.navigateTo({ url: '/pages/admin-pending/admin-pending?filter=urged' }); },
 
   handleLogout() {
     wx.showModal({

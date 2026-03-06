@@ -262,6 +262,9 @@
   padding: 0 10rpx;
 }
 
+.urged-item { position: relative; }
+.badge { position: absolute; top: -8rpx; right: -8rpx; background: #ff4d4f; color: #fff; font-size: 20rpx; border-radius: 50%; width: 36rpx; height: 36rpx; line-height: 36rpx; text-align: center; }
+
 /* Tips Section */
 .tips-section {
   margin: 0 30rpx;
