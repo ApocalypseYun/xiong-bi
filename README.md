@@ -58,13 +58,27 @@ JWT_SECRET=your_jwt_secret_key
 
 ### 3. 初始化数据库
 
+**全新安装：**
 ```bash
-# 先创建数据库
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS dormitory_repair CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-# 导入表结构和初始数据
-mysql -u root -p dormitory_repair < sql/init.sql
+mysql -u root -p dormitory_repair < server/sql/init.sql
 ```
+
+**已有旧数据库（v1 → v2 迁移）：**
+
+> 跳过此步骤会导致管理员登录后出现 403 错误。
+
+```bash
+# 如果 residents 表是旧结构（列名为 student_id 等 snake_case），先删除
+mysql -u root -p dormitory_repair -e "DROP TABLE IF EXISTS residents;"
+
+# 执行迁移
+mysql -u root -p dormitory_repair < server/sql/migrate_v2.sql
+```
+
+迁移内容：`users.role` 新增 `repairman`，旧 `admin` 值自动改为 `super_admin`；`repairOrders` 新增 `repairmanId / lastUrgedAt / urgeCount / withdrawn 状态`；`evaluations` 新增双向评价字段；`residents` 表重建。
+
+**迁移后必须在微信开发者工具清除 Storage 缓存，再重新登录**，否则旧 JWT token 里的 `role: admin` 会持续触发 403。
 
 ### 4. 启动后端服务
 
@@ -87,8 +101,10 @@ node app.js
 
 | 角色 | 用户名 | 密码 |
 |------|--------|------|
-| 管理员 | admin | admin123 |
+| 超级管理员 | admin | admin123 |
 | 学生 | 2024001 | 123456 |
+
+> 学生注册需要与 `residents` 表匹配。测试住户数据：学号 `2024001`、姓名 `张三`、手机 `13800000000`、A栋、101、`123456789@qq.com`
 
 ## 功能特性
 
@@ -158,6 +174,15 @@ pending（待处理）→ processing（处理中）→ completed（已完成）
 | POST | /completion | 上传完成凭证 |
 
 ## 常见问题
+
+**Q: 管理员登录后报 403 Insufficient permissions？**
+
+A: JWT token 里的 role 是登录时写死的，数据库迁移不会自动更新旧 token。解决：
+1. 确认迁移已执行（`admin` 用户 role 应为 `super_admin`）
+2. 微信开发者工具 → 右侧调试面板 → **Storage** → 清空全部
+3. 重新编译小程序，重新登录
+
+---
 
 **Q: 小程序报 `Foundation.onLoad is not a function` 错误？**
 
