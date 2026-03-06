@@ -13,7 +13,7 @@
       <text class="order-user">报修人: {{item.userRealName}}</text>
       <text class="order-contact">联系电话: {{item.contactPhone}}</text>
       <text class="order-time">提交时间: {{item.createdAt}}</text>
-      <view class="image-list" wx:if="{{item.images.length > 0}}">
+      <view class="image-list" wx:if="{{item.images && item.images.length > 0}}">
         <image wx:for="{{item.images}}" wx:for-item="img" wx:key="imageUrl" src="{{img.imageUrl}}" mode="aspectFill" class="order-img" />
       </view>
       <button class="accept-btn" bindtap="handleAccept" data-id="{{item.orderId}}">接单</button>

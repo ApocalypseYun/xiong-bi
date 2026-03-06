@@ -1,6 +1,4 @@
-const { get, put, post } = require('../../utils/request.js');
-
-const BASE_URL = 'http://localhost:3000/api';
+const { get, put, post, BASE_URL } = require('../../utils/request.js');
 
 Page({
   data: {
@@ -23,8 +21,8 @@ Page({
       if (res.code === 200) {
         const processingOrders = res.data.filter(o => o.status === 'processing');
         const completedOrders = res.data.filter(o => o.status === 'completed');
-        // Fetch eval status for completed orders
-        for (const order of completedOrders) {
+        // Fetch eval status for completed orders in parallel
+        await Promise.all(completedOrders.map(async (order) => {
           try {
             const evalRes = await get(`/evaluations/order/${order.orderId}`);
             if (evalRes.code === 200 && evalRes.data) {
@@ -38,7 +36,7 @@ Page({
             order.hasUserEval = false;
             order.hasRepairmanEval = false;
           }
-        }
+        }));
         this.setData({ processingOrders, completedOrders });
       }
     } catch (err) {

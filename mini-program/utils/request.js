@@ -23,6 +23,7 @@ const request = (options) => {
 };
 
 module.exports = {
+  BASE_URL,
   get: (url, data) => request({ url, data, method: 'GET' }),
   post: (url, data) => request({ url, data, method: 'POST' }),
   put: (url, data) => request({ url, data, method: 'PUT' }),
