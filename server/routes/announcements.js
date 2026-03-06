@@ -12,8 +12,8 @@ const {
 router.get('/', getAllAnnouncements);
 
 // 管理员公告路由
-router.post('/admin', authenticate, authorize(['admin']), createAnnouncement);
-router.put('/admin/:id', authenticate, authorize(['admin']), updateAnnouncement);
-router.delete('/admin/:id', authenticate, authorize(['admin']), deleteAnnouncement);
+router.post('/admin', authenticate, authorize(['super_admin']), createAnnouncement);
+router.put('/admin/:id', authenticate, authorize(['super_admin']), updateAnnouncement);
+router.delete('/admin/:id', authenticate, authorize(['super_admin']), deleteAnnouncement);
 
 module.exports = router;

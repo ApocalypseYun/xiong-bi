@@ -80,7 +80,7 @@ router.post(
 router.post(
   '/completion',
   authenticate,
-  authorize(['admin']),
+  authorize(['repairman']),
   upload.fields([
     { name: 'image', maxCount: 1 },
     { name: 'images', maxCount: 5 }
@@ -88,7 +88,7 @@ router.post(
   (req, res) => {
     try {
       const files = req.files;
-      
+
       if (!files || (!files.image && !files.images)) {
         return error(res, '请选择要上传的图片', 400);
       }

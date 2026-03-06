@@ -24,7 +24,11 @@
         <text class="role-tab-icon">👨‍🎓</text>
         <text>学生</text>
       </view>
-      <view class="role-tab {{role === 'admin' ? 'active' : ''}}" bindtap="switchRole" data-role="admin">
+      <view class="role-tab {{role === 'repairman' ? 'active' : ''}}" bindtap="switchRole" data-role="repairman">
+        <text class="role-tab-icon">🔧</text>
+        <text>维修工</text>
+      </view>
+      <view class="role-tab {{role === 'super_admin' ? 'active' : ''}}" bindtap="switchRole" data-role="super_admin">
         <text class="role-tab-icon">👨‍💼</text>
         <text>管理员</text>
       </view>
