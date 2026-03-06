@@ -15,10 +15,24 @@ npm run dev      # Development: nodemon app.js (auto-reload)
 ```
 
 ### Database Setup
+
+**Fresh install** (new machine, empty database):
 ```bash
-# Initialize schema (from MySQL client)
-source server/sql/init.sql
+mysql -u root -p dormitory_repair < server/sql/init.sql
 ```
+
+**Existing database migration** (v1 → v2, required on all machines):
+```bash
+mysql -u root -p dormitory_repair < server/sql/migrate_v2.sql
+```
+
+v2 迁移内容：
+- `residents` 表重建（若存在旧 snake_case 版本，需先手动 `DROP TABLE residents`）
+- `users.role` ENUM 增加 `repairman`，旧 `admin` 值自动改为 `super_admin`
+- `repairOrders` 新增 `repairmanId`、`lastUrgedAt`、`urgeCount`，`status` 增加 `withdrawn`
+- `evaluations` 新增 `repairmanRating`、`repairmanComment`、`repairmanEvaluatedAt`
+
+> **注意**：迁移后必须重新登录小程序，使 JWT token 刷新为新的 `role: super_admin`。
 
 ### Frontend
 Open `mini-program/` directory in WeChat Developer Tools. No build step required.
@@ -53,17 +67,19 @@ mini-program/     # WeChat Mini Program
 ### Order Lifecycle
 ```
 pending → processing → completed
-(student submits)  (admin accepts)  (admin uploads proof + closes)
+       ↘ withdrawn
+(student submits) (repairman accepts) (repairman uploads proof + closes)
 ```
-Evaluations become available only after `completed` status.
+Student can urge (>6h pending) or withdraw (pending only). Evaluations available after `completed`; repairman can counter-rate after student rates.
 
 ### Database Tables
-- `users` — roles: `student`, `super_admin`
-- `repairOrders` — status: `pending`, `processing`, `completed`
+- `users` — roles: `student`, `repairman`, `super_admin`
+- `repairOrders` — status: `pending`, `processing`, `completed`, `withdrawn`; fields: `repairmanId`, `urgeCount`, `lastUrgedAt`
 - `orderImages` — problem photos (cascade delete with order)
-- `completionImages` — repair proof photos
-- `evaluations` — one per order, rating 1-5
+- `completionImages` — repair proof photos (uploaded by repairman)
+- `evaluations` — one per order; student rates repairman (`rating`), repairman can counter-rate (`repairmanRating`)
 - `announcements` — admin-managed, `isActive` toggle
+- `residents` — pre-loaded resident roster; registration requires matching all 6 fields
 
 ### File Uploads
 - Multer stores files in `server/public/images/`

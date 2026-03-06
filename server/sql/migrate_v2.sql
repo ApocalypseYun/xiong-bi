@@ -1,5 +1,5 @@
--- server/sql/migrate_v2.sql
--- 宿舍报修系统 v2 数据库迁移
+-- server/sql/migrate_v2_fixed.sql
+-- 宿舍报修系统 v2 数据库迁移（兼容 MySQL 8+/9+）
 
 -- 1. 新增住户预置表
 CREATE TABLE IF NOT EXISTS residents (
@@ -14,18 +14,67 @@ CREATE TABLE IF NOT EXISTS residents (
   createdAt    DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 2. users 表 ENUM 增加 repairman
--- Migrate existing 'admin' role rows to 'super_admin' before changing ENUM
+-- 2. users 表：先把旧 'admin' 改为 'super_admin'，再修改 ENUM
 UPDATE users SET role = 'super_admin' WHERE role = 'admin';
 ALTER TABLE users MODIFY COLUMN role ENUM('student', 'repairman', 'super_admin') DEFAULT 'student';
 
--- 3. repairOrders 新增字段
+-- 3. repairOrders：修改 status ENUM
 ALTER TABLE repairOrders MODIFY COLUMN status ENUM('pending', 'processing', 'completed', 'withdrawn') DEFAULT 'pending';
-ALTER TABLE repairOrders ADD COLUMN IF NOT EXISTS repairmanId INT NULL;
-ALTER TABLE repairOrders ADD COLUMN IF NOT EXISTS lastUrgedAt DATETIME NULL;
-ALTER TABLE repairOrders ADD COLUMN IF NOT EXISTS urgeCount INT NOT NULL DEFAULT 0;
 
--- Add FK conditionally (safe to re-run)
+-- 4. repairOrders：条件添加列（用存储过程绕过 IF NOT EXISTS 限制）
+DROP PROCEDURE IF EXISTS add_column_if_missing;
+DELIMITER $$
+CREATE PROCEDURE add_column_if_missing()
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'repairOrders' AND COLUMN_NAME = 'repairmanId'
+  ) THEN
+    ALTER TABLE repairOrders ADD COLUMN repairmanId INT NULL;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'repairOrders' AND COLUMN_NAME = 'lastUrgedAt'
+  ) THEN
+    ALTER TABLE repairOrders ADD COLUMN lastUrgedAt DATETIME NULL;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'repairOrders' AND COLUMN_NAME = 'urgeCount'
+  ) THEN
+    ALTER TABLE repairOrders ADD COLUMN urgeCount INT NOT NULL DEFAULT 0;
+  END IF;
+
+  -- evaluations 双向评价字段
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'evaluations' AND COLUMN_NAME = 'repairmanRating'
+  ) THEN
+    ALTER TABLE evaluations ADD COLUMN repairmanRating INT NULL CHECK (repairmanRating BETWEEN 1 AND 5);
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'evaluations' AND COLUMN_NAME = 'repairmanComment'
+  ) THEN
+    ALTER TABLE evaluations ADD COLUMN repairmanComment TEXT NULL;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'evaluations' AND COLUMN_NAME = 'repairmanEvaluatedAt'
+  ) THEN
+    ALTER TABLE evaluations ADD COLUMN repairmanEvaluatedAt DATETIME NULL;
+  END IF;
+END$$
+DELIMITER ;
+
+CALL add_column_if_missing();
+DROP PROCEDURE IF EXISTS add_column_if_missing;
+
+-- 5. 添加外键（条件判断）
 SET @fk_exists = (
   SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
   WHERE CONSTRAINT_SCHEMA = DATABASE()
@@ -41,14 +90,21 @@ PREPARE stmt FROM @sql;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
--- Index on repairmanId for repairman query performance
-CREATE INDEX IF NOT EXISTS idx_repairmanId ON repairOrders (repairmanId);
+-- 6. 添加索引（条件判断）
+SET @idx_exists = (
+  SELECT COUNT(*) FROM information_schema.STATISTICS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'repairOrders'
+    AND INDEX_NAME = 'idx_repairmanId'
+);
+SET @sql2 = IF(@idx_exists = 0,
+  'CREATE INDEX idx_repairmanId ON repairOrders (repairmanId)',
+  'SELECT 1'
+);
+PREPARE stmt2 FROM @sql2;
+EXECUTE stmt2;
+DEALLOCATE PREPARE stmt2;
 
--- 4. evaluations 新增双向评价字段
-ALTER TABLE evaluations ADD COLUMN IF NOT EXISTS repairmanRating INT NULL CHECK (repairmanRating BETWEEN 1 AND 5);
-ALTER TABLE evaluations ADD COLUMN IF NOT EXISTS repairmanComment TEXT NULL;
-ALTER TABLE evaluations ADD COLUMN IF NOT EXISTS repairmanEvaluatedAt DATETIME NULL;
-
--- 5. 测试住户数据
+-- 7. 测试住户数据
 INSERT IGNORE INTO residents (studentId, name, phone, building, roomNumber, qqEmail)
 VALUES ('2024001', '张三', '13800000000', 'A栋', '101', '123456789@qq.com');
