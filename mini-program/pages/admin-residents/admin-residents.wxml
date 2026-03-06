@@ -1,1 +1,49 @@
-<view>loading...</view>
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">住户管理</text>
+    <view class="header-btns">
+      <button class="import-btn" bindtap="handleImport">Excel导入</button>
+      <button class="add-btn" bindtap="openAddModal">+ 新增</button>
+    </view>
+  </view>
+
+  <view class="search-bar">
+    <input placeholder="按学号搜索" value="{{searchStudentId}}" bindinput="onSearchInput" class="search-input" />
+    <button bindtap="handleSearch" class="search-btn">搜索</button>
+  </view>
+
+  <view wx:if="{{isLoading}}" class="loading">加载中...</view>
+  <view wx:elif="{{residents.length === 0}}" class="empty">暂无住户记录</view>
+  <view class="resident-list" wx:else>
+    <view class="resident-item" wx:for="{{residents}}" wx:key="residentId">
+      <view class="resident-info">
+        <text class="student-id">学号: {{item.studentId}}</text>
+        <text class="resident-name">{{item.name}}</text>
+        <text class="resident-detail">{{item.building}} {{item.roomNumber}} | {{item.phone}}</text>
+        <text class="resident-email">{{item.qqEmail}}</text>
+        <text wx:if="{{item.isRegistered}}" class="registered-tag">已注册</text>
+      </view>
+      <view class="resident-actions">
+        <button class="edit-btn" bindtap="openEditModal" data-item="{{item}}">编辑</button>
+        <button class="delete-btn" bindtap="handleDelete" data-id="{{item.residentId}}">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新增/编辑弹窗 -->
+  <view class="modal-overlay" wx:if="{{showModal}}">
+    <view class="modal">
+      <text class="modal-title">{{isEdit ? '编辑住户' : '新增住户'}}</text>
+      <input placeholder="学号" value="{{form.studentId}}" bindinput="onFormInput" data-field="studentId" class="form-input" disabled="{{isEdit}}" />
+      <input placeholder="姓名" value="{{form.name}}" bindinput="onFormInput" data-field="name" class="form-input" />
+      <input placeholder="手机号" value="{{form.phone}}" bindinput="onFormInput" data-field="phone" class="form-input" />
+      <input placeholder="栋数" value="{{form.building}}" bindinput="onFormInput" data-field="building" class="form-input" />
+      <input placeholder="寝室号" value="{{form.roomNumber}}" bindinput="onFormInput" data-field="roomNumber" class="form-input" />
+      <input placeholder="QQ邮箱" value="{{form.qqEmail}}" bindinput="onFormInput" data-field="qqEmail" class="form-input" />
+      <view class="modal-btns">
+        <button bindtap="closeModal" class="cancel-btn">取消</button>
+        <button bindtap="handleSave" class="submit-btn">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,1 +1,37 @@
-<view>loading...</view>
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">维修工管理</text>
+    <button class="add-btn" bindtap="openAddModal">+ 新增</button>
+  </view>
+
+  <view wx:if="{{isLoading}}" class="loading">加载中...</view>
+  <view wx:elif="{{repairmen.length === 0}}" class="empty">暂无维修工账号</view>
+  <view class="repairman-list" wx:else>
+    <view class="repairman-item" wx:for="{{repairmen}}" wx:key="userId">
+      <view class="repairman-info">
+        <text class="repairman-name">{{item.realName}}</text>
+        <text class="repairman-username">账号: {{item.username}}</text>
+        <text class="repairman-phone">电话: {{item.phone}}</text>
+      </view>
+      <view class="repairman-actions">
+        <button class="edit-btn" bindtap="openEditModal" data-item="{{item}}">编辑</button>
+        <button class="delete-btn" bindtap="handleDelete" data-id="{{item.userId}}">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新增/编辑弹窗 -->
+  <view class="modal-overlay" wx:if="{{showModal}}">
+    <view class="modal">
+      <text class="modal-title">{{isEdit ? '编辑维修工' : '新增维修工'}}</text>
+      <input placeholder="账号（用户名）" value="{{form.username}}" bindinput="onFormInput" data-field="username" class="form-input" disabled="{{isEdit}}" />
+      <input placeholder="{{isEdit ? '新密码（不填则不修改）' : '密码（至少6位）'}}" value="{{form.password}}" bindinput="onFormInput" data-field="password" class="form-input" password />
+      <input placeholder="姓名" value="{{form.realName}}" bindinput="onFormInput" data-field="realName" class="form-input" />
+      <input placeholder="手机号" value="{{form.phone}}" bindinput="onFormInput" data-field="phone" class="form-input" />
+      <view class="modal-btns">
+        <button bindtap="closeModal" class="cancel-btn">取消</button>
+        <button bindtap="handleSave" class="submit-btn">保存</button>
+      </view>
+    </view>
+  </view>
+</view>
