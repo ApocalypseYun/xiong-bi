@@ -32,7 +32,7 @@ Page({
 
   checkAdminAccess() {
     const userInfo = getUserInfo();
-    if (!userInfo || userInfo.role !== 'admin') {
+    if (!userInfo || userInfo.role !== 'super_admin') {
       wx.showToast({
         title: '无权限访问',
         icon: 'none',
