@@ -1,4 +1,5 @@
 const API_BASE = 'http://localhost:3000';
+const { post, del } = require('../../utils/request');
 
 const statusMap = {
   'pending': { text: '待处理', color: '#f5a623', bgColor: '#fff7e6' },
@@ -83,6 +84,9 @@ Page({
             imageUrls: order.images ? order.images.map(img => img.imageUrl) : []
           }));
 
+          formattedOrders.forEach(o => {
+            if (o.status === 'pending') o.urgeStatus = this.computeUrgeStatus(o);
+          });
           this.setData({
             orders: this.data.page === 1 ? formattedOrders : [...this.data.orders, ...formattedOrders],
             hasMore: orders.length === this.data.pageSize,
@@ -158,6 +162,55 @@ Page({
     }
   },
 
+
+  computeUrgeStatus(order) {
+    if (order.status !== 'pending') return null;
+    const now = new Date();
+    const createdAt = new Date(order.createdAt);
+    const hours = (now - createdAt) / (1000 * 60 * 60);
+    if (hours >= 6) return { canUrge: true, msg: '催促管理员' };
+    const remain = (6 - hours).toFixed(1);
+    return { canUrge: false, msg: `${remain}h后可催促` };
+  },
+
+  async handleUrge(e) {
+    const orderId = e.currentTarget.dataset.id;
+    try {
+      const res = await post(`/orders/${orderId}/urge`, {});
+      wx.showToast({ title: res.message || (res.code === 200 ? '催促成功' : '操作失败'), icon: res.code === 200 ? 'success' : 'none' });
+      if (res.code === 200) this.loadOrders();
+    } catch {
+      wx.showToast({ title: '网络错误', icon: 'none' });
+    }
+  },
+
+  async handleWithdraw(e) {
+    const orderId = e.currentTarget.dataset.id;
+    wx.showModal({
+      title: '确认撤回',
+      content: '撤回后报修单将关闭，确认吗？',
+      success: async (modalRes) => {
+        if (!modalRes.confirm) return;
+        try {
+          const res = await del(`/orders/${orderId}`);
+          if (res.code === 200) {
+            wx.showToast({ title: '已撤回', icon: 'success' });
+            this.loadOrders();
+          } else {
+            wx.showToast({ title: res.message || '撤回失败', icon: 'none' });
+          }
+        } catch {
+          wx.showToast({ title: '网络错误', icon: 'none' });
+        }
+      }
+    });
+  },
+
+  loadOrders() {
+    this.setData({ orders: [], page: 1, hasMore: true }, () => {
+      this.fetchOrders();
+    });
+  },
 
   formatDate(dateString) {
     if (!dateString) return '';

@@ -70,6 +70,16 @@
         <text class="order-id">单号: {{item.orderId}}</text>
         <text class="order-time">{{item.createdAtFormatted}}</text>
       </view>
+
+      <view wx:if="{{item.status === 'pending'}}" class="order-actions">
+        <button
+          class="action-btn {{item.urgeStatus.canUrge ? 'urge-active' : 'urge-disabled'}}"
+          bindtap="handleUrge"
+          data-id="{{item.orderId}}"
+          disabled="{{!item.urgeStatus.canUrge}}"
+        >{{item.urgeStatus.msg}}</button>
+        <button class="action-btn withdraw-btn" bindtap="handleWithdraw" data-id="{{item.orderId}}">撤回</button>
+      </view>
     </view>
 
     <view class="empty-state" wx:if="{{orders.length === 0 && !loading}}">
