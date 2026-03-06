@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "收到的评价",
+  "navigationBarBackgroundColor": "#6b4c3d",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#f8f6f3",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+}

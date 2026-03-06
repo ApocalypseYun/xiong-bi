@@ -16,6 +16,7 @@
     "pages/repairman/repairman",
     "pages/repairman-orders/repairman-orders",
     "pages/repairman-active/repairman-active",
+    "pages/repairman-evaluations/repairman-evaluations",
     "pages/admin-residents/admin-residents",
     "pages/admin-repairmen/admin-repairmen"
   ],

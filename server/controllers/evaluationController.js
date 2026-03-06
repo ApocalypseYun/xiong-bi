@@ -124,9 +124,34 @@ const getOrderEvaluation = async (req, res) => {
   }
 };
 
+// 获取维修工收到的评价
+const getRepairmanEvaluations = async (req, res) => {
+  try {
+    const repairmanId = req.user.userId;
+
+    const [evaluations] = await pool.execute(
+      `SELECT e.evaluationId, e.orderId, e.rating, e.content, e.createdAt,
+              u.username, u.realName,
+              o.description as orderDescription
+       FROM evaluations e
+       LEFT JOIN repairOrders o ON e.orderId = o.orderId
+       LEFT JOIN users u ON o.userId = u.userId
+       WHERE o.repairmanId = ?
+       ORDER BY e.createdAt DESC`,
+      [repairmanId]
+    );
+
+    return success(res, evaluations, '获取成功');
+  } catch (err) {
+    console.error('获取维修工评价错误:', err);
+    return error(res, '获取维修工评价失败', 500);
+  }
+};
+
 module.exports = {
   createEvaluation,
   getMyEvaluations,
   getAllEvaluations,
-  getOrderEvaluation
+  getOrderEvaluation,
+  getRepairmanEvaluations
 };

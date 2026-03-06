@@ -1,32 +1,133 @@
 <view class="container">
-  <view class="header">
-    <text class="title">维修工工作台</text>
-    <text class="subtitle">{{userInfo.realName || userInfo.username}}</text>
-  </view>
-
-  <view class="stats-row">
-    <view class="stat-card" bindtap="goToPending">
-      <text class="stat-num">{{pendingCount}}</text>
-      <text class="stat-label">待接单</text>
+  <!-- User Info Header -->
+  <view class="user-header">
+    <view class="user-info">
+      <view class="avatar">
+        <text class="avatar-text">{{userInfo.realName ? userInfo.realName[0] : '修'}}</text>
+      </view>
+      <view class="user-detail">
+        <text class="user-name">{{userInfo.realName || '维修师傅'}}</text>
+        <text class="user-role">宿舍维修人员</text>
+      </view>
     </view>
-    <view class="stat-card" bindtap="goToActive">
-      <text class="stat-num">{{myActiveOrders.length}}</text>
-      <text class="stat-label">进行中</text>
-    </view>
-    <view class="stat-card">
-      <text class="stat-num">{{myCompletedCount}}</text>
-      <text class="stat-label">已完成</text>
+    <view class="logout-btn" bindtap="handleLogout">
+      <text class="logout-icon">退出</text>
     </view>
   </view>
 
-  <view class="section-title" wx:if="{{myActiveOrders.length > 0}}">我的进行中订单</view>
-  <view class="order-list">
-    <view class="order-item" wx:for="{{myActiveOrders}}" wx:key="orderId" bindtap="goToActive">
-      <text class="order-type">{{item.repairType}}</text>
-      <text class="order-room">{{item.building}} {{item.roomNumber}}</text>
-      <text class="order-status processing">维修中</text>
+  <!-- Stats Cards -->
+  <view class="stats-section">
+    <view class="stats-card" bindtap="goToPending">
+      <view class="stats-content">
+        <view class="stats-icon pending">🕐</view>
+        <view class="stats-info">
+          <text class="stats-number">{{pendingCount}}</text>
+          <text class="stats-label">待接单</text>
+        </view>
+      </view>
+      <view class="stats-arrow">
+        <text class="arrow-icon">›</text>
+      </view>
+      <view class="stats-badge" wx:if="{{pendingCount > 0}}">
+        <text>待处理</text>
+      </view>
+    </view>
+    
+    <view class="stats-row">
+      <view class="stats-card-small" bindtap="goToActive">
+        <view class="stats-icon-sm processing">🔧</view>
+        <text class="stats-num-sm">{{myActiveOrders.length}}</text>
+        <text class="stats-label-sm">进行中</text>
+      </view>
+      <view class="stats-card-small">
+        <view class="stats-icon-sm completed">✓</view>
+        <text class="stats-num-sm">{{myCompletedCount}}</text>
+        <text class="stats-label-sm">已完成</text>
+      </view>
+      <view class="stats-card-small" bindtap="goToEvaluations">
+        <view class="stats-icon-sm evaluation">⭐</view>
+        <text class="stats-num-sm">{{evaluationCount}}</text>
+        <text class="stats-label-sm">收到评价</text>
+      </view>
     </view>
   </view>
 
-  <button class="logout-btn" bindtap="handleLogout">退出登录</button>
+  <!-- Announcements Carousel -->
+  <view class="section" wx:if="{{announcements.length > 0}}">
+    <view class="section-title">
+      <text class="title-icon">📢</text>
+      <text>最新公告</text>
+    </view>
+    
+    <view class="announcement-carousel">
+      <swiper class="swiper" autoplay="true" interval="5000" duration="500" circular="true" bindchange="onSwiperChange">
+        <swiper-item wx:for="{{announcements}}" wx:key="announcementId" bindtap="viewAnnouncement" data-index="{{index}}">
+          <view class="announcement-item">
+            <view class="announcement-badge">NEW</view>
+            <text class="announcement-title">{{item.title}}</text>
+            <text class="announcement-date">{{item.createdAt}}</text>
+          </view>
+        </swiper-item>
+      </swiper>
+      <view class="swiper-dots">
+        <view wx:for="{{announcements}}" wx:key="*this" class="dot {{currentSwiper === index ? 'active' : ''}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Quick Actions Grid -->
+  <view class="section">
+    <view class="section-title">
+      <text class="title-icon">⚡</text>
+      <text>工作功能</text>
+    </view>
+    
+    <view class="action-grid">
+      <view class="action-item primary" bindtap="goToPending">
+        <view class="action-icon pending">🕐</view>
+        <text class="action-name">待接订单</text>
+        <view class="action-badge" wx:if="{{pendingCount > 0}}">{{pendingCount}}</view>
+      </view>
+      
+      <view class="action-item" bindtap="goToActive">
+        <view class="action-icon processing">🔧</view>
+        <text class="action-name">进行中</text>
+        <view class="action-badge" wx:if="{{myActiveOrders.length > 0}}">{{myActiveOrders.length}}</view>
+      </view>
+      
+      <view class="action-item" bindtap="goToEvaluations">
+        <view class="action-icon evaluation">⭐</view>
+        <text class="action-name">我的评价</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- My Active Orders -->
+  <view class="section" wx:if="{{myActiveOrders.length > 0}}">
+    <view class="section-title">
+      <text class="title-icon">📋</text>
+      <text>我的进行中订单</text>
+    </view>
+    
+    <view class="order-list">
+      <view class="order-item" wx:for="{{myActiveOrders}}" wx:key="orderId" bindtap="goToActive">
+        <view class="order-left">
+          <text class="order-type">{{item.repairType}}</text>
+          <text class="order-room">{{item.building}} {{item.roomNumber}}</text>
+        </view>
+        <view class="order-right">
+          <text class="order-status processing">维修中</text>
+          <text class="order-arrow">›</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Tips Section -->
+  <view class="tips-section">
+    <view class="tips-card">
+      <text class="tips-title">💡 工作提示</text>
+      <text class="tips-content">请及时接单并完成维修任务，保持良好的服务态度。完成维修后记得上传完工照片，学生会对您的服务进行评价。</text>
+    </view>
+  </view>
 </view>
