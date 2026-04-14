@@ -28,13 +28,19 @@ Page({
             if (evalRes.code === 200 && evalRes.data) {
               order.hasUserEval = !!evalRes.data.rating;
               order.hasRepairmanEval = !!evalRes.data.repairmanRating;
+              order.userRating = evalRes.data.rating || 0;
+              order.userComment = evalRes.data.comment || '';
             } else {
               order.hasUserEval = false;
               order.hasRepairmanEval = false;
+              order.userRating = 0;
+              order.userComment = '';
             }
           } catch {
             order.hasUserEval = false;
             order.hasRepairmanEval = false;
+            order.userRating = 0;
+            order.userComment = '';
           }
         }));
         this.setData({ processingOrders, completedOrders });
@@ -93,7 +99,7 @@ Page({
 
   closeEvalModal() { this.setData({ showEvalModal: false }); },
 
-  onRatingChange(e) { this.setData({ evalRating: parseInt(e.detail.value) }); },
+  onRatingChange(e) { this.setData({ evalRating: parseInt(e.currentTarget.dataset.rating) }); },
   onCommentInput(e) { this.setData({ evalComment: e.detail.value }); },
 
   async submitEval() {

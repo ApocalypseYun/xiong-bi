@@ -11,6 +11,11 @@
     </view>
     <view class="stat-divider"></view>
     <view class="stat-item">
+      <text class="stat-value">{{stats.average}}</text>
+      <text class="stat-label">平均分</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
       <text class="stat-value">{{stats.good}}</text>
       <text class="stat-label">好评</text>
     </view>
@@ -75,8 +80,8 @@
             <text class="desc-text">{{item.orderDescription}}</text>
           </view>
           
-          <view class="content-preview" wx:if="{{item.content}}">
-            <text class="content-text">{{item.content}}</text>
+          <view class="content-preview" wx:if="{{item.comment}}">
+            <text class="content-text">{{item.comment}}</text>
           </view>
         </view>
 
@@ -154,14 +159,14 @@
         </view>
       </view>
       
-      <view class="content-section" wx:if="{{currentEvaluation.content}}">
+      <view class="content-section" wx:if="{{currentEvaluation.comment}}">
         <text class="section-title">评价内容</text>
         <view class="content-box">
-          <text class="content-full">{{currentEvaluation.content}}</text>
+          <text class="content-full">{{currentEvaluation.comment}}</text>
         </view>
       </view>
       
-      <view class="content-section empty-content" wx:if="{{!currentEvaluation.content}}">
+      <view class="content-section empty-content" wx:if="{{!currentEvaluation.comment}}">
         <text class="section-title">评价内容</text>
         <text class="no-content-text">学生未填写文字评价</text>
       </view>

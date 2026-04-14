@@ -123,9 +123,10 @@ const getOrderById = async (req, res) => {
       [id]
     );
 
-    // 查询评价
+    // 查询评价（包含维修工反向评价）
     const [evaluations] = await pool.execute(
-      'SELECT evaluationId, rating, comment, createdAt FROM evaluations WHERE orderId = ?',
+      `SELECT evaluationId, rating, comment, repairmanRating, repairmanComment, repairmanEvaluatedAt, createdAt
+       FROM evaluations WHERE orderId = ?`,
       [id]
     );
 

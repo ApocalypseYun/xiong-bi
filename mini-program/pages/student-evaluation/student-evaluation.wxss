@@ -153,6 +153,14 @@
   transform: scale(1.05);
 }
 
+.star-item.active.repairman {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+}
+
+.rating-text.blue {
+  color: #1890ff;
+}
+
 .star-item.disabled {
   opacity: 0.7;
 }

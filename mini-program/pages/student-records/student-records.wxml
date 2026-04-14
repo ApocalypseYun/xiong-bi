@@ -181,7 +181,18 @@
               <text class="star filled" wx:for="{{[1,2,3,4,5]}}" wx:key="*this" wx:if="{{item <= currentOrder.evaluation.rating}}">★</text>
               <text class="star" wx:for="{{[1,2,3,4,5]}}" wx:key="*this" wx:if="{{item > currentOrder.evaluation.rating}}">★</text>
             </view>
-            <text class="evaluation-content">{{currentOrder.evaluation.comment || currentOrder.evaluation.content}}</text>
+            <text class="evaluation-content">{{currentOrder.evaluation.comment || '暂无评价内容'}}</text>
+          </view>
+        </view>
+
+        <view class="detail-block evaluation-block repairman-eval-block" wx:if="{{currentOrder.evaluation && currentOrder.evaluation.repairmanRating}}">
+          <text class="detail-label">维修工评价</text>
+          <view class="evaluation-display">
+            <view class="star-display">
+              <text class="star filled repairman-star" wx:for="{{[1,2,3,4,5]}}" wx:key="*this" wx:if="{{item <= currentOrder.evaluation.repairmanRating}}">★</text>
+              <text class="star repairman-star" wx:for="{{[1,2,3,4,5]}}" wx:key="*this" wx:if="{{item > currentOrder.evaluation.repairmanRating}}">★</text>
+            </view>
+            <text class="evaluation-content">{{currentOrder.evaluation.repairmanComment || '维修工未填写评价'}}</text>
           </view>
         </view>
       </view>

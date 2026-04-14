@@ -107,7 +107,7 @@ Page({
               order: order,
               existingEvaluation: order.evaluation,
               rating: order.evaluation.rating,
-              content: order.evaluation.comment || order.evaluation.content || ''
+              content: order.evaluation.comment || ''
             });
           } else {
             this.setData({ order: order });

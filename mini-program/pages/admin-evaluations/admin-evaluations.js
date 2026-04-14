@@ -52,17 +52,22 @@ Page({
           const evaluations = (res.data || []).map(item => ({
             ...item,
             ratingLabel: ratingLabels[item.rating] || '未评价',
-            createdAtFormatted: this.formatDate(item.createdAt)
+            repairmanRatingLabel: ratingLabels[item.repairmanRating] || '',
+            createdAtFormatted: this.formatDate(item.createdAt),
+            repairmanEvaluatedAtFormatted: this.formatDate(item.repairmanEvaluatedAt)
           }));
 
           // 计算统计数据
           const stats = {
             total: evaluations.length,
             good: evaluations.filter(item => item.rating >= 4).length,
-            fiveStar: evaluations.filter(item => item.rating === 5).length
+            fiveStar: evaluations.filter(item => item.rating === 5).length,
+            average: evaluations.length > 0
+              ? (evaluations.reduce((sum, item) => sum + item.rating, 0) / evaluations.length).toFixed(1)
+              : '0.0'
           };
 
-          this.setData({ 
+          this.setData({
             evaluations,
             stats,
             loading: false,

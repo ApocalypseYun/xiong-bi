@@ -89,6 +89,29 @@
           <text>评价时间: {{existingEvaluation.createdAt}}</text>
         </view>
       </view>
+
+      <view class="repairman-eval" wx:if="{{existingEvaluation && existingEvaluation.repairmanRating}}">
+        <view class="card-header" style="margin-top: 30rpx; padding-top: 30rpx; border-top: 2rpx solid #f0f0f0;">
+          <text class="card-title">维修工评价</text>
+        </view>
+        <view class="rating-section" style="padding: 20rpx 0;">
+          <view class="star-rating">
+            <view
+              class="star-item {{existingEvaluation.repairmanRating >= item ? 'active repairman' : ''}} disabled"
+              wx:for="{{[1, 2, 3, 4, 5]}}"
+              wx:key="*this"
+            >
+              <text class="star-icon">★</text>
+            </view>
+          </view>
+          <text class="rating-text blue">
+            {{existingEvaluation.repairmanRating === 1 ? '非常不满意' : existingEvaluation.repairmanRating === 2 ? '不满意' : existingEvaluation.repairmanRating === 3 ? '一般' : existingEvaluation.repairmanRating === 4 ? '满意' : '非常满意'}}
+          </text>
+        </view>
+        <view class="content-display" wx:if="{{existingEvaluation.repairmanComment}}" style="padding-top: 0;">
+          <text class="content-text">{{existingEvaluation.repairmanComment}}</text>
+        </view>
+      </view>
     </view>
 
     <view class="action-area" wx:if="{{!existingEvaluation}}">

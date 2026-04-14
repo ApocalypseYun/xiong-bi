@@ -11,6 +11,11 @@
     </view>
     <view class="stat-divider"></view>
     <view class="stat-item">
+      <text class="stat-value">{{stats.average}}</text>
+      <text class="stat-label">平均分</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
       <text class="stat-value">{{stats.good}}</text>
       <text class="stat-label">好评</text>
     </view>
@@ -70,8 +75,8 @@
             <text class="rating-label">{{item.ratingLabel}}</text>
           </view>
           
-          <view class="content-preview" wx:if="{{item.content}}">
-            <text class="content-text">{{item.content}}</text>
+          <view class="content-preview" wx:if="{{item.comment}}">
+            <text class="content-text">{{item.comment}}</text>
           </view>
         </view>
 
@@ -114,14 +119,19 @@
       <view class="detail-section">
         <view class="detail-row">
           <text class="detail-label">用户</text>
-          <text class="detail-value">{{currentEvaluation.username || '未知用户'}}</text>
+          <text class="detail-value">{{currentEvaluation.realName || currentEvaluation.username || '未知用户'}}</text>
         </view>
-        
+
+        <view class="detail-row" wx:if="{{currentEvaluation.repairmanName}}">
+          <text class="detail-label">维修工</text>
+          <text class="detail-value">{{currentEvaluation.repairmanName}}</text>
+        </view>
+
         <view class="detail-row">
           <text class="detail-label">评分</text>
           <view class="detail-rating">
             <view class="stars large">
-              <text 
+              <text
                 class="star {{index < currentEvaluation.rating ? 'filled' : ''}}"
                 wx:for="[1,2,3,4,5]"
                 wx:key="*this"
@@ -130,28 +140,56 @@
             <text class="rating-score">{{currentEvaluation.rating}}分</text>
           </view>
         </view>
-        
+
         <view class="detail-row">
           <text class="detail-label">评价等级</text>
           <text class="detail-value rating-label-{{currentEvaluation.rating}}">{{currentEvaluation.ratingLabel}}</text>
         </view>
-        
+
         <view class="detail-row">
           <text class="detail-label">评价时间</text>
           <text class="detail-value">{{currentEvaluation.createdAtFormatted}}</text>
         </view>
       </view>
-      
-      <view class="content-section" wx:if="{{currentEvaluation.content}}">
-        <text class="section-title">评价内容</text>
+
+      <view class="content-section" wx:if="{{currentEvaluation.comment}}">
+        <text class="section-title">学生评价</text>
         <view class="content-box">
-          <text class="content-full">{{currentEvaluation.content}}</text>
+          <text class="content-full">{{currentEvaluation.comment}}</text>
         </view>
       </view>
-      
-      <view class="content-section empty-content" wx:if="{{!currentEvaluation.content}}">
-        <text class="section-title">评价内容</text>
+
+      <view class="content-section empty-content" wx:if="{{!currentEvaluation.comment}}">
+        <text class="section-title">学生评价</text>
         <text class="no-content-text">用户未填写文字评价</text>
+      </view>
+
+      <view class="repairman-eval-section" wx:if="{{currentEvaluation.repairmanRating}}">
+        <view class="section-divider"></view>
+        <text class="section-title">维修工反向评价</text>
+        <view class="detail-rating" style="margin-top: 12rpx;">
+          <view class="stars large">
+            <text
+              class="star blue {{index < currentEvaluation.repairmanRating ? 'filled' : ''}}"
+              wx:for="[1,2,3,4,5]"
+              wx:key="*this"
+            >★</text>
+          </view>
+          <text class="rating-score blue-score">{{currentEvaluation.repairmanRating}}分</text>
+        </view>
+        <view class="eval-label-row">
+          <text class="detail-value">{{currentEvaluation.repairmanRatingLabel}}</text>
+          <text class="detail-value" style="margin-left: 20rpx; color: #999;">{{currentEvaluation.repairmanEvaluatedAtFormatted}}</text>
+        </view>
+        <view class="content-box" wx:if="{{currentEvaluation.repairmanComment}}" style="margin-top: 16rpx;">
+          <text class="content-full">{{currentEvaluation.repairmanComment}}</text>
+        </view>
+      </view>
+
+      <view class="repairman-eval-section" wx:if="{{!currentEvaluation.repairmanRating}}">
+        <view class="section-divider"></view>
+        <text class="section-title">维修工反向评价</text>
+        <text class="no-content-text">维修工尚未评价</text>
       </view>
     </view>
   </view>

@@ -17,6 +17,17 @@
     <text class="repair-type">{{item.repairType}}</text>
     <text class="order-location">{{item.building}} {{item.roomNumber}}</text>
     <text class="order-status completed">已完成</text>
+
+    <view class="user-eval-preview" wx:if="{{item.hasUserEval}}">
+      <view class="eval-preview-header">
+        <text class="eval-preview-label">用户评价</text>
+        <view class="mini-stars">
+          <text class="mini-star {{index < item.userRating ? 'filled' : ''}}" wx:for="{{[1,2,3,4,5]}}" wx:key="*this">★</text>
+        </view>
+      </view>
+      <text class="eval-preview-text" wx:if="{{item.userComment}}">{{item.userComment}}</text>
+    </view>
+
     <button wx:if="{{item.hasUserEval && !item.hasRepairmanEval}}" class="eval-btn" bindtap="openEvalModal" data-id="{{item.orderId}}">评价用户</button>
     <text wx:elif="{{item.hasRepairmanEval}}" class="eval-done">已评价</text>
     <text wx:else class="eval-wait">等待用户评价后可评价</text>
@@ -26,8 +37,21 @@
   <view class="modal-overlay" wx:if="{{showEvalModal}}">
     <view class="modal">
       <text class="modal-title">评价用户</text>
-      <text class="modal-label">评分 (1-5)</text>
-      <slider min="1" max="5" value="{{evalRating}}" show-value bindchange="onRatingChange" />
+      <text class="modal-label">评分</text>
+      <view class="star-rating">
+        <view
+          class="star-item {{evalRating >= item ? 'active' : ''}}"
+          wx:for="{{[1, 2, 3, 4, 5]}}"
+          wx:key="*this"
+          data-rating="{{item}}"
+          bindtap="onRatingChange"
+        >
+          <text class="star-icon">★</text>
+        </view>
+      </view>
+      <text class="rating-text" wx:if="{{evalRating > 0}}">
+        {{evalRating === 1 ? '非常不满意' : evalRating === 2 ? '不满意' : evalRating === 3 ? '一般' : evalRating === 4 ? '满意' : '非常满意'}}
+      </text>
       <textarea placeholder="评价内容（选填）" bindinput="onCommentInput" class="eval-textarea" />
       <view class="modal-btns">
         <button bindtap="closeEvalModal" class="cancel-btn">取消</button>

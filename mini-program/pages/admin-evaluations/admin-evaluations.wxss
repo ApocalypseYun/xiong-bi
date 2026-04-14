@@ -486,3 +486,31 @@
   text-align: center;
   padding: 40rpx 0;
 }
+
+.repairman-eval-section {
+  margin-top: 30rpx;
+}
+
+.section-divider {
+  height: 2rpx;
+  background: linear-gradient(90deg, transparent, #d4a574, transparent);
+  margin-bottom: 24rpx;
+}
+
+.star.blue {
+  color: #b0c4de;
+}
+
+.star.blue.filled {
+  color: #1890ff;
+}
+
+.blue-score {
+  color: #1890ff !important;
+}
+
+.eval-label-row {
+  display: flex;
+  align-items: center;
+  margin-top: 8rpx;
+}

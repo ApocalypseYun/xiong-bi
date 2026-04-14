@@ -49,18 +49,18 @@ const createEvaluation = async (req, res) => {
       return error(res, '该订单已评价，不能重复评价', 400);
     }
 
-    // 创建评价
+    // 创建评价（数据库列名为 comment，不是 content）
     const [result] = await pool.execute(
-      `INSERT INTO evaluations (orderId, userId, rating, content, createdAt) 
-       VALUES (?, ?, ?, ?, NOW())`,
-      [orderId, userId, rating, content || null]
+      `INSERT INTO evaluations (orderId, rating, comment, createdAt)
+       VALUES (?, ?, ?, NOW())`,
+      [orderId, rating, content || null]
     );
 
     return success(res, {
       evaluationId: result.insertId,
       orderId,
       rating,
-      content
+      comment: content || null
     }, '评价成功');
   } catch (err) {
     console.error('创建评价错误:', err);
@@ -74,11 +74,14 @@ const getMyEvaluations = async (req, res) => {
     const userId = req.user.userId;
 
     const [evaluations] = await pool.execute(
-      `SELECT e.evaluationId, e.orderId, e.rating, e.content, e.createdAt,
-              o.description as orderDescription
+      `SELECT e.evaluationId, e.orderId, e.rating, e.comment, e.createdAt,
+              e.repairmanRating, e.repairmanComment, e.repairmanEvaluatedAt,
+              o.description as orderDescription,
+              ru.realName as repairmanName
        FROM evaluations e
        LEFT JOIN repairOrders o ON e.orderId = o.orderId
-       WHERE e.userId = ?
+       LEFT JOIN users ru ON o.repairmanId = ru.userId
+       WHERE o.userId = ?
        ORDER BY e.createdAt DESC`,
       [userId]
     );
@@ -94,12 +97,15 @@ const getMyEvaluations = async (req, res) => {
 const getAllEvaluations = async (req, res) => {
   try {
     const [evaluations] = await pool.execute(
-      `SELECT e.evaluationId, e.orderId, e.rating, e.content, e.createdAt,
+      `SELECT e.evaluationId, e.orderId, e.rating, e.comment, e.createdAt,
+              e.repairmanRating, e.repairmanComment, e.repairmanEvaluatedAt,
               u.username, u.realName,
-              o.description as orderDescription
+              o.description as orderDescription,
+              ru.realName as repairmanName
        FROM evaluations e
-       LEFT JOIN users u ON e.userId = u.userId
        LEFT JOIN repairOrders o ON e.orderId = o.orderId
+       LEFT JOIN users u ON o.userId = u.userId
+       LEFT JOIN users ru ON o.repairmanId = ru.userId
        ORDER BY e.createdAt DESC`
     );
 
@@ -116,7 +122,11 @@ const getOrderEvaluation = async (req, res) => {
     const { orderId } = req.params;
     const orderIdNum = parseInt(orderId, 10);
     if (isNaN(orderIdNum)) return error(res, '无效的订单ID', 400);
-    const [rows] = await pool.execute('SELECT * FROM evaluations WHERE orderId = ?', [orderIdNum]);
+    const [rows] = await pool.execute(
+      `SELECT evaluationId, orderId, rating, comment, repairmanRating, repairmanComment, repairmanEvaluatedAt, createdAt
+       FROM evaluations WHERE orderId = ?`,
+      [orderIdNum]
+    );
     return success(res, rows.length > 0 ? rows[0] : null, '获取评价成功');
   } catch (err) {
     console.error('获取评价错误:', err);
@@ -130,7 +140,7 @@ const getRepairmanEvaluations = async (req, res) => {
     const repairmanId = req.user.userId;
 
     const [evaluations] = await pool.execute(
-      `SELECT e.evaluationId, e.orderId, e.rating, e.content, e.createdAt,
+      `SELECT e.evaluationId, e.orderId, e.rating, e.comment, e.createdAt,
               u.username, u.realName,
               o.description as orderDescription
        FROM evaluations e

@@ -61,7 +61,10 @@ Page({
           const stats = {
             total: evaluations.length,
             good: evaluations.filter(item => item.rating >= 4).length,
-            fiveStar: evaluations.filter(item => item.rating === 5).length
+            fiveStar: evaluations.filter(item => item.rating === 5).length,
+            average: evaluations.length > 0
+              ? (evaluations.reduce((sum, item) => sum + item.rating, 0) / evaluations.length).toFixed(1)
+              : '0.0'
           };
 
           this.setData({ 
